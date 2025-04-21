@@ -1,0 +1,113 @@
+.navbar {
+    height: 60px;
+    background-color: #F9F9F9 !important;
+    box-shadow: 0px 2px 6px 0px #0000001A !important;
+    padding: 18px 30px !important;
+}
+.dashboard-section{
+    padding: 30px 14px;
+}
+.sidebar-section{
+    width: 60px;
+    border-radius: 10px;
+    background-color: #17567C;
+    height: 100vh;
+    position: relative;
+    padding: 20px;
+}
+.sidebar-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    top: 27px;
+    left: 18px;
+    position: absolute;
+}
+.scenario-section{
+    width: 100%;
+}
+.scenario-heading{
+    font-size: 32px;
+    font-weight: 300;
+    color: #000000;
+}
+.form-control {
+    height: 40px;
+    font-size: 14px;
+    font-weight: 400;
+    border: 1px solid #D1D5DB;
+    outline: none;
+    border-radius: 4px;
+}
+.search-icon{
+    top:55%; 
+    right: 15px; 
+    transform: translateY(-50%); 
+    cursor: pointer;
+}
+.scenario1{
+    border: 1px solid #DBDBDB;
+    height: 246px;
+    padding: 20px;
+    border-radius: 4px;
+}
+.scenario1.selected {
+    border-color: #195F8A;
+}
+.scenario-head{
+    color: #000000;
+    font-size: 16px;
+    font-weight: 700;
+}
+.scenario-text{
+    font-size: 14px;
+    font-weight: 400;
+    color: #606060;
+}
+
+.border-end{
+    height: 10px;
+}
+.border-center {
+    width: 1px;   
+    height: 10px; 
+    background-color: #606060; 
+    margin: 0 10px; 
+}
+.scenario-record{
+    background-color: #EFEFEF;
+    height: 150px;
+}
+.top-right-img {
+    position: absolute;
+    width: 75px;
+}
+.btn {
+    height: 40px;
+    padding: 8px 25px;
+    font-size: 14px;
+    font-weight: 400;
+    border-radius: 4px;
+    outline: none;
+    box-shadow: none;
+}
+.btn-primary {
+    border-color: #195F8A;
+    background: #195F8A;
+    color: #FFFFFF;
+}
+.btn-primary:hover {
+    border-color: #195F8A;
+    background: #195F8A;
+    color: #FFFFFF;
+}
+.form-select:focus,.form-select:active,.form-control:focus,.form-control:active{
+    outline: none;
+    box-shadow: none;
+}
+.form-select,.form-control{
+    font-size: 14px;
+    color: #BABBBB;
+}
+
+  
