@@ -1,0 +1,110 @@
+.modal-content {
+    border-radius: 4px;
+    padding: 10px;
+}
+.modal-header {
+    padding: 15px 20px;
+    height: 60px;
+    background-color: #E8EFF3;
+    border-bottom: none;
+}
+.modal-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: #000000;
+}
+.modal-body {
+    padding: 20px;
+}
+.selected-screens {
+    border: 1px solid #E4E4E4;
+    height: 178px;
+    border-radius: 4px;
+    padding: 4px 14px;
+}
+.selected-radio {
+    width: 50%;
+}
+.form-check-label {
+    font-size: 14px;
+    color: #2B2E3C;
+    font-weight: 400;
+}
+.form-check-input:checked {
+    outline: none !important;
+}
+.modal-footer {
+    border-top: none;
+}
+.btn {
+    height: 36px;
+    padding: 8px 25px;
+    font-size: 14px;
+    font-weight: 400;
+    border-radius: 4px;
+    outline: none;
+    box-shadow: none;
+}
+.btn-secondary {
+    border-color: #B8CEDB;
+    color: #195F8A;
+    background: #F6F7F8;
+}
+.btn-primary {
+    border-color: #195F8A;
+    background: #195F8A;
+    color: #FFFFFF;
+}
+.btn-primary:hover {
+    border-color: #195F8A;
+    background: #195F8A;
+    color: #FFFFFF;
+}
+.btn-secondary:hover {
+    border-color: #B8CEDB;
+    color: #195F8A;
+    background: #F6F7F8;
+}
+.btn-close {
+    outline: none !important;
+    box-shadow: none !important;
+}
+.upload-section {
+    border: 2px dashed #ADADAD;
+    height: 206px;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+}
+.upload-text {
+    font-size: 14px;
+    font-weight: 400;
+    color: #9BA0A4;
+}
+.upload-pdf {
+    border: 1px solid #E2E2E2;
+    border-radius: 4px;
+    height: 60px;
+    padding: 10px;
+}
+.delete-icon {
+    width: 18px;
+    height: 18px;
+}
+.pdf-format {
+    box-shadow: 0px 0px 4px 0px #00000024;
+}
+.pdf-text-name {
+    color: #000000;
+    font-size: 14px;
+    font-weight: 400;
+}
+.pdf-size {
+    font-size: 12px;
+    font-weight: 400;
+    color: #818181
+}
+.upload-text{
+    font-size: 14px;
+    color: #9BA0A4;
+}
