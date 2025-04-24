@@ -1,4 +1,4 @@
-import { SET_USER, SET_POSTS } from './actionTypes';
+import { SET_USER, SET_POSTS, SET_CURRENT_SCENARIO } from './actionTypes';
 import initialState from './initialState';
 
 const rootReducer = (state = initialState, action) => {
@@ -7,6 +7,8 @@ const rootReducer = (state = initialState, action) => {
       return { ...state, user: action.payload };
     case SET_POSTS:
       return { ...state, posts: action.payload };
+    case SET_CURRENT_SCENARIO:
+      return { ...state, currentScenario: action.payload };
     default:
       return state;
   }

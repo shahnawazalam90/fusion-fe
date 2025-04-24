@@ -3,7 +3,7 @@ import './download.css';
 function Download() {
   return (
     <>
-      
+
       <button
         type="button"
         className="btn btn-primary"
@@ -24,7 +24,7 @@ function Download() {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title" id="exampleModalLabel">
-              Download
+                Download
               </h1>
               <button
                 type="button"
@@ -35,13 +35,7 @@ function Download() {
             </div>
 
             <div className="modal-body">
-                   <p className="text">The Json File is created and is ready to download.</p>
-
-
-
-
-
-               
+              <p className="text">The Json File is created and is ready to download.</p>
             </div>
 
             <div className="modal-footer">
