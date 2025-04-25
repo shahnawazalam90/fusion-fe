@@ -1,18 +1,55 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+
+import store from '../../store';
+import { setCurrentScenarioValue } from '../../store/actions';
 
 import ScreenAccordion from "./screenAccordion";
 
 import "./create-new.css";
+import { toTitleCase } from "../../utils";
 
 function Create() {
   const currentScenario = useSelector((state) => state.currentScenario);
+  const currentScenarioValue = useSelector((state) => state.currentScenarioValue);
 
-  console.log("Current Scenario:", currentScenario);
+  const [actionsChecked, setActionsChecked] = useState([]);
+
+  useEffect(() => {
+    const updatedChecked = currentScenario.map(({ actions }) => actions.map(() => false));
+    setActionsChecked(updatedChecked);
+  }, []);
+
+  const allActionsSelected = useMemo(() => {
+    return actionsChecked.find((screenChecked) => screenChecked.find((actionChecked) => !actionChecked) !== undefined) === undefined;
+  }, [actionsChecked]);
+
+  const checkAllActions = () => {
+    const updatedChecked = actionsChecked.map((screenActions) => screenActions.map(() => !allActionsSelected));
+    setActionsChecked(updatedChecked);
+  };
+
+  const checkScreenActions = (parentIndex) => {
+    const updatedChecked = [...actionsChecked];
+    updatedChecked[parentIndex] = updatedChecked[parentIndex].map(() => !allActionsSelected);
+    setActionsChecked(updatedChecked);
+  };
+
+  const checkAction = (parentIndex, childIndex) => {
+    const updatedChecked = [...actionsChecked];
+    updatedChecked[parentIndex] = [...updatedChecked[parentIndex]];
+
+    updatedChecked[parentIndex][childIndex] = !updatedChecked[parentIndex][childIndex];
+
+    setActionsChecked(updatedChecked);
+  };
+
+  const handleChange = (parentIndex, childIndex, value) => {
+    store.dispatch(setCurrentScenarioValue(parentIndex, childIndex, value));
+  };
 
   return (
     <div className="main-section">
-
       {/* <!---navbar----> */}
       <nav className="navbar px-3 py-2 d-flex justify-content-between align-items-center">
         <div className="d-flex align-items-center">
@@ -40,7 +77,7 @@ function Create() {
           <div className="d-flex justify-content-between align-items-center mb-3">
             <div className="d-flex align-items-center">
               <label className="form-label-checkbox mb-0 me-2">Select All</label>
-              <input type="checkbox" className="form-check-input mt-0" />
+              <input type="checkbox" className="form-check-input mt-0" checked={allActionsSelected} onChange={() => checkAllActions()} />
             </div>
             <div className="position-relative">
               <input type="text" className="form-control" placeholder="Search" />
@@ -54,14 +91,22 @@ function Create() {
 
           {/* Accordion */}
           <div className="flex-grow-1 overflow-auto">
-            {currentScenario.map(screen =>
-              <ScreenAccordion
-                key={screen.screenName + screen.actions.length}
-                screen={screen}
-              />
-            )}
+            {currentScenario.map((screen, i) => {
+              const screenNameID = screen.screenName.replace(/\s+/g, '') + i;
+              return (
+                <ScreenAccordion
+                  key={screen.screenName + screen.actions.length}
+                  screen={screen}
+                  screenNameID={screenNameID}
+                  screenValues={currentScenarioValue[i]}
+                  actionsChecked={actionsChecked[i] || [false]}
+                  toggleAction={(j) => checkAction(i, j)}
+                  toggleScreenActions={() => checkScreenActions(i)}
+                  onChange={(j, value) => handleChange(i, j, value)}
+                />
+              )
+            })}
           </div>
-
 
           <div className="d-flex justify-content-end mt-4">
             <button className="btn btn-secondary me-3">Cancel</button>
@@ -94,16 +139,17 @@ function Create() {
                 Selected Screens <span className="text-danger">*</span>
               </label>
               <div className="row">
-                <div className="col-md-4">
-                  <div className="selected-screen-create d-flex align-items-center position-relative">
-                    <input type="checkbox" className="form-check-input me-2 mt-0" id="screen1" />
-                    <label htmlFor="screen1" className="mb-0 form-label">Screen 1</label>
-
-                    <img
-                      src="../../../src/assets/checked-slected.png"
-                      alt="icon"
-                      className="top-right-img"
-                    />
+                <div className="col-md-12">
+                  <div className="selected-screen-create d-flex flex-column gap-2 position-relative">
+                    {currentScenario.map((screen, i) => {
+                      const screenNameID = screen.screenName.replace(/\s+/g, '') + i;
+                      return (
+                        <div key={screenNameID} className="d-flex align-items-center">
+                          <input type="checkbox" className="form-check-input me-2 mt-0" id={`${screenNameID}checkbox`} />
+                          <label htmlFor={`${screenNameID}checkbox`} className="mb-0 form-label">{toTitleCase(screen.screenName)}</label>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               </div>

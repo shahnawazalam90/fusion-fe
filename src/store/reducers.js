@@ -1,4 +1,4 @@
-import { SET_USER, SET_POSTS, SET_CURRENT_SCENARIO } from './actionTypes';
+import { SET_USER, SET_POSTS, SET_CURRENT_SCENARIO, SET_CURRENT_SCENARIO_VALUE } from './actionTypes';
 import initialState from './initialState';
 
 const rootReducer = (state = initialState, action) => {
@@ -9,6 +9,18 @@ const rootReducer = (state = initialState, action) => {
       return { ...state, posts: action.payload };
     case SET_CURRENT_SCENARIO:
       return { ...state, currentScenario: action.payload };
+    case SET_CURRENT_SCENARIO_VALUE:
+      {
+        if (!action.payload) return state;
+        const { parentIndex, childIndex, value } = action.payload;
+        const currentScenarioValue = [...state.currentScenarioValue];
+
+        if (!currentScenarioValue[parentIndex]) currentScenarioValue[parentIndex] = [];
+        else currentScenarioValue[parentIndex] = [...currentScenarioValue[parentIndex]];
+        
+        currentScenarioValue[parentIndex][childIndex] = value;
+        return { ...state, currentScenarioValue };
+      }
     default:
       return state;
   }
