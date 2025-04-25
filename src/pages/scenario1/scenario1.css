@@ -96,13 +96,12 @@
     border: 1px solid #BABBBB;
     font-size: 14px;
     font-weight: 400;
-    color: #BABBBB;
+    color: #0f0f0f;
     border-radius: 4px;
     width: 100%;
     padding: 2px 10px;
 }
 .selected-screen-create{
-    height: 50px;
     border: 1px solid #B8CDDB;
     padding: 10px;
 }

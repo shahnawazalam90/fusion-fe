@@ -2,7 +2,7 @@ const initialState = {
   user: null,
   posts: [],
   currentScenario: null,
-  currentScenarioValue: [],
+  userScenarios: [],
 };
 
 export default initialState;

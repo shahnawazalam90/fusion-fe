@@ -1,6 +1,6 @@
-import { post } from './utils';
+import { post, get } from './utils';
 import store from '../store';
-import { setUser, setCurrentScenario } from '../store/actions';
+import { setUser, setCurrentScenario, setUserScenarios } from '../store/actions';
 
 export const login = async (email, password) => {
   const url = '/api/v1/auth/login';
@@ -35,6 +35,41 @@ export const uploadTS = async (file) => {
     return response;
   } catch (error) {
     console.error('File upload failed:', error);
+    throw error;
+  }
+};
+
+export const getUserScenarios = async () => {
+  const url = '/api/v1/scenarios/';
+
+  try {
+    const response = await get(url);
+    store.dispatch(setUserScenarios(response.data.map(scenario => ({
+      ...scenario,
+      jsonMetaData: JSON.parse(scenario.jsonMetaData),
+    }))));
+    return response;
+  } catch (error) {
+    console.error('Get user scenarios request failed:', error);
+    throw error;
+  }
+};
+
+export const postScenario = async (name, jsonMetaData) => {
+  const url = '/api/v1/scenarios/';
+  const payload = new URLSearchParams();
+  payload.append('name', name);
+  payload.append('jsonMetaData', jsonMetaData);
+
+  try {
+    const response = await post(url, payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Post scenario request failed:', error);
     throw error;
   }
 };

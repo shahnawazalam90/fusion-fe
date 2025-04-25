@@ -1,1 +1,6 @@
-export { login, uploadTS } from './requests';
+export {
+  login,
+  uploadTS,
+  getUserScenarios,
+  postScenario
+} from './requests';

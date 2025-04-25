@@ -1,59 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
-import { uploadTS } from "../../http";
+import { uploadTS, getUserScenarios } from "../../http";
 
 import './dashboard.css';
-
-const scenariosData = [
-  {
-    title: 'Placeholder Scenario 1',
-    screens: '10 screens',
-    date: 'April 14, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 2',
-    screens: '8 screens',
-    date: 'April 15, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 3',
-    screens: '12 screens',
-    date: 'April 16, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 4',
-    screens: '6 screens',
-    date: 'April 17, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 5',
-    screens: '9 screens',
-    date: 'April 18, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 6',
-    screens: '11 screens',
-    date: 'April 19, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 7',
-    screens: '7 screens',
-    date: 'April 20, 2025'
-  },
-  {
-    title: 'Placeholder Scenario 8',
-    screens: '13 screens',
-    date: 'April 21, 2025'
-  }
-];
+import store from "../../store";
+import { setCurrentScenario } from "../../store/actions";
 
 function Dashboard() {
   const navigate = useNavigate();
+  const userScenarios = useSelector((state) => state.userScenarios);
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(null);
   const [uploadedFile, setUploadedFile] = useState(null);
+
+  useEffect(() => {
+    getUserScenarios();
+  }, []);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -79,6 +43,17 @@ function Dashboard() {
         alert("Error uploading file. Please try again.");
       });
   }
+
+  const handleDuplicateScenario = (scenario) => {
+    store.dispatch(setCurrentScenario(
+      scenario.jsonMetaData.map((screen) => ({
+        ...screen,
+        actions: screen.actions.map((action) => ({ ...action, value: '' })),
+      }))
+    ));
+    navigate('/create');
+  };
+
 
   return (
     <div className="main-section">
@@ -129,33 +104,25 @@ function Dashboard() {
               </div>
 
               <div className="row">
-                {scenariosData.map((scenario, index) => (
+                {userScenarios.map((scenario, index) => (
                   <div className={`col-md-${isFilterVisible ? '4' : '3'} mb-3`} key={index}>
 
-                    <div className={`scenario1 position-relative ${selectedIndex === index ? 'selected' : ''}`}
-                      onClick={() => setSelectedIndex(index)}>
-                      <h5 className="scenario-head">{scenario.title}</h5>
+                    <div className='scenario1 position-relative'>
+                      <h5 className="scenario-head">{scenario.name}</h5>
                       <div className="d-flex align-items-center mb-2">
-                        <p className="scenario-text mb-0">{scenario.screens}</p>
+                        <p className="scenario-text mb-0">{scenario.jsonMetaData.length} screen(s)</p>
                         <div className="border-center"></div>
-                        <p className="scenario-text mb-0">{scenario.date}</p>
+                        <p className="scenario-text mb-0">{new Date(scenario.createdAt).toLocaleString()}</p>
                       </div>
-                      <div className="scenario-record"></div>
-                      {selectedIndex === index && (
-                        <img
-                          src="../../../src/assets/checked-slected.png"
-                          alt="Selected"
-                          className="top-right-img"
-                        />
-                      )}
+                      <div className="scenario-record">
+                        <div className="d-flex mt-5">
+                          <button className="btn btn-secondary me-3" onClick={() => handleDuplicateScenario(scenario)}>Duplicate</button>
+                          <button className="btn btn-primary">Upload Reports</button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="d-flex justify-content-end mt-5">
-                <button className="btn btn-secondary me-3">Save</button>
-                <button className="btn btn-primary me-3">Run</button>
               </div>
             </div>
 
@@ -292,7 +259,7 @@ function Dashboard() {
                         </div>
 
                         <div className="d-flex justify-content-between mb-4">
-                          <p className="upload-text">Supported Formats: PDF, JPG, JPEG, DOC</p>
+                          <p className="upload-text">Supported Formats: TS</p>
                           <p className="upload-text">Maximum file size: 80MB</p>
                         </div>
                       </>
@@ -350,12 +317,10 @@ function Dashboard() {
                 </div>
               </div>
             </div>
-
           </div>
         </div>
       </div>
     </div>
-
   );
 }
 

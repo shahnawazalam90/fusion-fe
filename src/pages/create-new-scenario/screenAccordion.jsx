@@ -1,15 +1,11 @@
 
-import React, { useMemo } from "react";
+import React from "react";
 
 import { toTitleCase } from "../../utils";
 
-export default function ScreenAccordion({ screen, screenNameID, screenValues, actionsChecked, toggleAction, toggleScreenActions, onChange }) {
-  const allActionsSelected = useMemo(() => {
-    return actionsChecked.find((actionChecked) =>  !actionChecked) === undefined;
-  }, [actionsChecked]);
-
+export default function ScreenAccordion({ screen, screenNameID, actionsChecked, screenSelected, toggleAction, toggleScreenActions, onChange }) {
   const getFieldName = (locator) => {
-    if (locator.includes("]")) {
+    if (locator && locator.includes("]")) {
       const startIndex = locator.lastIndexOf("=") + 1;
       const endIndex = locator.lastIndexOf("]");
       const fieldName = locator.substring(startIndex, endIndex);
@@ -38,7 +34,7 @@ export default function ScreenAccordion({ screen, screenNameID, screenValues, ac
               <span className="accordion-name">{toTitleCase(screen.screenName)}</span>
             </div>
           </button>
-          <input type="checkbox" className="form-check-input m-0 ms-1 me-3" checked={allActionsSelected} onChange={toggleScreenActions} />
+          <input type="checkbox" className="form-check-input m-0 ms-1 me-3" checked={screenSelected} onChange={toggleScreenActions} />
         </h2>
         <div
           id={`${screenNameID}accordion`}
@@ -49,18 +45,18 @@ export default function ScreenAccordion({ screen, screenNameID, screenValues, ac
             <table className="table">
               <thead>
                 <tr>
-                  <th><input type="checkbox" checked={allActionsSelected} onChange={toggleScreenActions} /></th>
+                  <th><input type="checkbox" checked={screenSelected} onChange={toggleScreenActions} /></th>
                   <th className="table-heading">Field Name</th>
                   <th className="table-heading">Value</th>
                 </tr>
               </thead>
               <tbody>
-                {screen.actions.map(({ locator }, i) =>
+                {screen.actions.map(({ locator, value }, i) =>
                   <tr key={locator + i}>
                     <th scope="row"><input type="checkbox" checked={actionsChecked[i] || false} onChange={() => toggleAction(i)} /></th>
                     <td className="table-content">{getFieldName(locator)}</td>
                     <td>
-                      <input type="text" placeholder="Enter text" className="form-control-table" value={screenValues?.[i] || ''} onChange={({ target: { value } }) => onChange(i, value)} />
+                      <input type="text" placeholder="Enter text" className="form-control-table" value={value} onChange={({ target: { value } }) => onChange(i, value)} />
                     </td>
                   </tr>
                 )}
