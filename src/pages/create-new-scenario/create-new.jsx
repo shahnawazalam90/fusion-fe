@@ -93,7 +93,10 @@ function Create() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    // Maybe not necessary, but just in case
     document.getElementById("downloadModalCloseBtn").click();
+
     navigate('/dashboard');
   };
 

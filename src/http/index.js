@@ -2,5 +2,7 @@ export {
   login,
   uploadTS,
   getUserScenarios,
-  postScenario
+  postScenario,
+  getReports,
+  postReport,
 } from './requests';

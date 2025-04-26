@@ -1,6 +1,6 @@
 import { post, get } from './utils';
 import store from '../store';
-import { setUser, setCurrentScenario, setUserScenarios } from '../store/actions';
+import { setUser, setCurrentScenario, setUserScenarios, setUserReports } from '../store/actions';
 
 export const login = async (email, password) => {
   const url = '/api/v1/auth/login';
@@ -70,6 +70,38 @@ export const postScenario = async (name, jsonMetaData) => {
     return response;
   } catch (error) {
     console.error('Post scenario request failed:', error);
+    throw error;
+  }
+};
+
+export const getReports = async () => {
+  const url = '/api/v1/reports/';
+
+  try {
+    const response = await get(url);
+    store.dispatch(setUserReports(response.data));
+    return response;
+  } catch (error) {
+    console.error('Get reports request failed:', error);
+    throw error;
+  }
+};
+
+export const postReport = async (scenarioId, file) => {
+  const url = '/api/v1/reports/';
+  const formData = new FormData();
+  formData.append('scenarioId', scenarioId);
+  formData.append('file', file);
+
+  try {
+    const response = await post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Post report request failed:', error);
     throw error;
   }
 };

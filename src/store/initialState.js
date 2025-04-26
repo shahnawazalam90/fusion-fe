@@ -3,6 +3,7 @@ const initialState = {
   posts: [],
   currentScenario: null,
   userScenarios: [],
+  userReports: [],
 };
 
 export default initialState;

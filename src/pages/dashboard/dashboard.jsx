@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
-import { uploadTS, getUserScenarios } from "../../http";
+import { uploadTS, getUserScenarios, getReports, postReport } from "../../http";
 
 import './dashboard.css';
 import store from "../../store";
@@ -11,13 +11,29 @@ import { setCurrentScenario } from "../../store/actions";
 function Dashboard() {
   const navigate = useNavigate();
   const userScenarios = useSelector((state) => state.userScenarios);
+  const userReports = useSelector((state) => state.userReports);
 
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploadedReport, setUploadedReport] = useState(null);
+  const [selectedScenario, setSelectedScenario] = useState(null);
 
   useEffect(() => {
     getUserScenarios();
+    getReports();
   }, []);
+
+  const scenarioReport = useMemo(() => {
+    if (userReports.length > 0) {
+      // Create a map of scenario IDs to their reports
+      return userReports.reduce((acc, report) => {
+        acc[report.scenarioId] = report;
+        return acc;
+      }, {});
+
+    }
+    return {};
+  }, [userReports]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -54,6 +70,38 @@ function Dashboard() {
     navigate('/create');
   };
 
+  const handleViewReports = (scenarioId) => {
+    console.log("View Reports for Scenario ID:", scenarioId);
+    // Implement the logic to view reports for the selected scenario
+  };
+
+  const handleReportUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.name.endsWith(".zip")) {
+      setUploadedReport(file);
+    } else {
+      alert("Only .zip files are allowed.");
+    }
+  }
+
+  const handleReportSubmit = () => {
+    postReport(selectedScenario, uploadedReport)
+      .then((response) => {
+        if (response.status === 'success') {
+          setUploadedReport(null);
+          setSelectedScenario(null);
+          getUserScenarios();
+          getReports();
+          document.getElementById("uploadReportModalCloseBtn").click();
+        } else {
+          alert("Report upload failed. Please try again.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error uploading report:", error);
+        alert("Error uploading report. Please try again.");
+      });
+  }
 
   return (
     <div className="main-section">
@@ -117,7 +165,23 @@ function Dashboard() {
                       <div className="scenario-record">
                         <div className="d-flex mt-5">
                           <button className="btn btn-secondary me-3" onClick={() => handleDuplicateScenario(scenario)}>Duplicate</button>
-                          <button className="btn btn-primary">Upload Reports</button>
+                          {scenarioReport[scenario.id] ? (
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => handleViewReports(scenario.id)}
+                            >
+                              View Reports
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => setSelectedScenario(scenario.id)}
+                              data-bs-toggle="modal"
+                              data-bs-target="#uploadReportModal"
+                            >
+                              Upload Reports
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -266,8 +330,7 @@ function Dashboard() {
                     }
 
                     {!!uploadedFile &&
-                      <div className="upload-pdf d-flex justify-content-between align-items-center"
-                        style={{ display: uploadedFile ? "flex" : "none" }}>
+                      <div className="upload-pdf d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center">
                           <img
                             src="../../../src/assets/TS.svg"
@@ -308,6 +371,129 @@ function Dashboard() {
                       className="btn btn-primary"
                       onClick={handleFileSubmit}
                       disabled={!uploadedFile}
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    >
+                      Ok
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Upload Report Modal */}
+            <div
+              className="modal fade"
+              id="uploadReportModal"
+              tabIndex="-1"
+              aria-labelledby="uploadReportModalLabel"
+              aria-hidden="true"
+            >
+              <div className="modal-dialog modal-dialog-centered modal-lg">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h1 className="modal-title" id="uploadReportModal">
+                      Upload Report
+                    </h1>
+                    <button
+                      id='uploadReportModalCloseBtn'
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      onClick={() => {
+                        setSelectedScenario(null);
+                        setUploadedReport(null);
+                      }}
+                    />
+                  </div>
+
+                  <div className="modal-body">
+                    {!uploadedReport &&
+                      <>
+                        <div
+                          className="upload-section mb-2"
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            const file = e.dataTransfer.files[0];
+                            if (file && file.name.endsWith(".zip")) {
+                              setUploadedReport(file);
+                            } else {
+                              alert("Only .zip files are allowed.");
+                            }
+                          }}
+                          onDragOver={(e) => e.preventDefault()}
+                        >
+                          <img
+                            src="../../../src/assets/Vector.png"
+                            alt="vector-icon"
+                            className="mb-3"
+                          />
+                          <p className="upload-text mb-2">Drag and drop files here</p>
+                          <p className="upload-text mb-2">or</p>
+                          <label htmlFor="report-upload" className="btn btn-secondary">
+                            Browse files
+                          </label>
+                          <input
+                            type="file"
+                            id="report-upload"
+                            style={{ display: 'none' }}
+                            onChange={handleReportUpload}
+                          />
+                        </div>
+
+                        <div className="d-flex justify-content-between mb-4">
+                          <p className="upload-text">Supported Formats: ZIP</p>
+                          <p className="upload-text">Maximum file size: 80MB</p>
+                        </div>
+                      </>
+                    }
+
+                    {!!uploadedReport &&
+                      <div className="upload-pdf d-flex justify-content-between align-items-center">
+                        <div className="d-flex align-items-center">
+                          <img
+                            src="../../../src/assets/TS.svg"
+                            alt="ts-format"
+                            className="me-2"
+                          />
+
+                          <div className="pdf-text">
+                            <p className="mb-0 pdf-text-name">{uploadedReport?.name}</p>
+                            <p className="mb-0 pdf-size">
+                              {(uploadedReport?.size / 1024).toFixed(2)} KB
+                            </p>
+                          </div>
+                        </div>
+
+                        <img
+                          src="../../../src/assets/delete.png"
+                          alt="delete-icon"
+                          className="delete-icon"
+                          onClick={() => setUploadedReport(null)}
+                        />
+                      </div>
+                    }
+                  </div>
+
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      onClick={() => {
+                        setSelectedScenario(null);
+                        setUploadedReport(null);
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={handleReportSubmit}
+                      disabled={!uploadedReport}
                       data-bs-dismiss="modal"
                       aria-label="Close"
                     >
