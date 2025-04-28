@@ -1,6 +1,6 @@
 import { post, get } from './utils';
 import store from '../store';
-import { setUser, setCurrentScenario, setUserScenarios, setUserReports } from '../store/actions';
+import { setUser, setCurrentScenario, setUserScenarios, setUserReports, setCurrentReport } from '../store/actions';
 
 export const login = async (email, password) => {
   const url = '/api/v1/auth/login';
@@ -102,6 +102,25 @@ export const postReport = async (scenarioId, file) => {
     return response;
   } catch (error) {
     console.error('Post report request failed:', error);
+    throw error;
+  }
+};
+
+export const viewReport = async (scenarioName, reportId) => {
+  const url = '/api/v1/reports/view';
+  const payload = new URLSearchParams();
+  payload.append('reportId', reportId);
+
+  try {
+    const response = await post(url, payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    store.dispatch(setCurrentReport({scenarioName, reportURL: `http://localhost:3000${response.data[0].publicUrl}`}));
+    return response;
+  } catch (error) {
+    console.error('View report request failed:', error);
     throw error;
   }
 };

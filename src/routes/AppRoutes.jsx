@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import PrivateRoute from './PrivateRoute';
 import Login from '../pages/login/login';
 import Create from '../pages/create-new-scenario/create-new';
+import ViewReport from '../pages/viewReport/viewReport';
 import Confirmation from '../pages/confirmation/confirmation';
 import Download from '../pages/download/download';
 import Dashboard from '../pages/dashboard/dashboard';
@@ -29,6 +30,14 @@ function AppRoutes() {
           element={
             <PrivateRoute user={user}>
               <Create />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/viewReport"
+          element={
+            <PrivateRoute user={user}>
+              <ViewReport />
             </PrivateRoute>
           }
         />

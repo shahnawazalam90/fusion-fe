@@ -1,0 +1,113 @@
+.navbar {
+    height: 60px;
+    background-color: #F9F9F9 !important;
+    box-shadow: 0px 2px 6px 0px #0000001A !important;
+    padding: 18px 30px !important;
+}
+.modal-content{
+    border-radius: 4px;
+    padding: 10px;
+}
+.modal-header{
+    padding: 15px 20px;
+    height: 60px;
+    background-color: #F5FAFF;
+    border-bottom: none;
+}
+.modal-title{
+    font-size: 20px;
+    font-weight: 500;
+    color: #000000;
+}
+.modal-body{
+    padding: 20px 30px;
+}
+.form-label-checkbox{
+    color: #000000;
+    font-size: 16px;
+    font-weight: 400;
+}
+.selected-screens{
+    border: 1px solid #E4E4E4;
+    height: 178px;
+    border-radius: 4px;
+    padding: 4px 14px;
+}
+.form-check-label{
+    font-size: 14px;
+    color: #797979;
+    font-weight: 400;
+}
+.scenario-heading{
+    font-size: 32px;
+    font-weight: 300;
+    color: #000000;
+}
+.accordion-button:focus{
+    outline: none;
+    box-shadow: none;
+}
+.accordion-header{
+    border: 1px solid #D6D6D6;
+}
+.accordion-item{
+    background-color: #F9F9F9;
+}
+.accordion-button:not(.collapsed){
+    background-color: #F9F9F9;
+}
+.accordion-name{
+    font-size: 16px;
+    color: #343434;
+}
+.form-check-input{
+    border: 1px solid #D6D6D6;
+    background-color: #D6D6D6;
+    border-radius: none !important;
+    height: 24px;
+    width: 24px;
+}
+.form-check-input[type=checkbox]{
+    border-radius: 0;
+}
+.accordion-collapse{
+    border: 1px solid #D6D6D6;
+    padding: 20px;
+    background-color:#ffffff;
+}
+.accordion-button::after{
+    content: none;
+}
+.accordion-body{
+    border: 1px solid #D6D6D6;
+}
+.table-heading{
+    color: #313131;
+    font-size: 14px;
+    font-weight: 600;
+}
+.table-content{
+    color: #5B5A5A;
+    font-size: 14px;
+    font-weight: 400;
+}
+.form-control-table{
+    height: 26px;
+    border: 1px solid #BABBBB;
+    font-size: 14px;
+    font-weight: 400;
+    color: #0f0f0f;
+    border-radius: 4px;
+    width: 100%;
+    padding: 2px 10px;
+}
+.selected-screen-create{
+    border: 1px solid #B8CDDB;
+    padding: 10px;
+}
+.top-right-img {
+    position: absolute;
+    top: -1px;
+    right: 0px;
+    width: 50px !important;
+}

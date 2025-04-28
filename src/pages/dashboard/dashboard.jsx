@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
-import { uploadTS, getUserScenarios, getReports, postReport } from "../../http";
+import { uploadTS, getUserScenarios, getReports, postReport, viewReport } from "../../http";
 
 import './dashboard.css';
 import store from "../../store";
@@ -70,9 +70,9 @@ function Dashboard() {
     navigate('/create');
   };
 
-  const handleViewReports = (scenarioId) => {
-    console.log("View Reports for Scenario ID:", scenarioId);
-    // Implement the logic to view reports for the selected scenario
+  const handleViewReports = (scenarioName, reportId) => {
+    viewReport(scenarioName, reportId);
+    navigate('/viewReport');
   };
 
   const handleReportUpload = (e) => {
@@ -168,9 +168,9 @@ function Dashboard() {
                           {scenarioReport[scenario.id] ? (
                             <button
                               className="btn btn-primary"
-                              onClick={() => handleViewReports(scenario.id)}
+                              onClick={() => handleViewReports(scenario.name, scenarioReport[scenario.id].id)}
                             >
-                              View Reports
+                              View Report
                             </button>
                           ) : (
                             <button
@@ -179,7 +179,7 @@ function Dashboard() {
                               data-bs-toggle="modal"
                               data-bs-target="#uploadReportModal"
                             >
-                              Upload Reports
+                              Upload Report
                             </button>
                           )}
                         </div>
@@ -453,7 +453,7 @@ function Dashboard() {
                       <div className="upload-pdf d-flex justify-content-between align-items-center">
                         <div className="d-flex align-items-center">
                           <img
-                            src="../../../src/assets/TS.svg"
+                            src="../../../src/assets/Zip.svg"
                             alt="ts-format"
                             className="me-2"
                           />

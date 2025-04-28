@@ -5,4 +5,5 @@ export {
   postScenario,
   getReports,
   postReport,
+  viewReport,
 } from './requests';

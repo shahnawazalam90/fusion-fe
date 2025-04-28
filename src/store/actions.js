@@ -1,4 +1,4 @@
-import { SET_USER, SET_POSTS, SET_CURRENT_SCENARIO, SET_CURRENT_SCENARIO_VALUE, SET_USER_SCENARIOS, SET_USER_REPORTS } from './actionTypes';
+import { SET_USER, SET_POSTS, SET_CURRENT_SCENARIO, SET_CURRENT_SCENARIO_VALUE, SET_USER_SCENARIOS, SET_USER_REPORTS, SET_CURRENT_REPORT } from './actionTypes';
 
 export const setUser = (user) => ({
   type: SET_USER,
@@ -28,4 +28,9 @@ export const setUserScenarios = (scenarios) => ({
 export const setUserReports = (reports) => ({
   type: SET_USER_REPORTS,
   payload: reports,
+});
+
+export const setCurrentReport = ({scenarioName, reportURL}) => ({
+  type: SET_CURRENT_REPORT,
+  payload: { scenarioName, reportURL },
 });
