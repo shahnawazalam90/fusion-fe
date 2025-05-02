@@ -3,6 +3,10 @@ import initialState from './initialState';
 
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
+    case 'CLEAR_DATA':
+      return initialState;
+    case 'SET_MENU_VISIBILITY':
+      return { ...state, menu_visibility: action.payload };
     case SET_USER:
       return { ...state, user: action.payload };
     case SET_POSTS:

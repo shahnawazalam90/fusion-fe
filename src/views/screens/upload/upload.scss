@@ -1,0 +1,23 @@
+.upload-container {
+  .upload-heading {
+    font-weight: 300;
+    font-size: 32px;
+  }
+
+  .upload-file-wrapper {
+    border: 2px dashed #ADADAD;
+
+    .upload-file-icon {
+      font-size: 36px;
+    }
+  }
+
+  .uploaded-file-wrapper {
+    border: 1px solid #ADADAD;
+
+    .delete-file-icon {
+      cursor: pointer;
+      font-size: 24px;
+    }
+  }
+}

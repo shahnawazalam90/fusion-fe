@@ -1,7 +1,8 @@
 const initialState = {
-  user: null,
+  menu_visibility: true,
+  user: {},
   posts: [],
-  currentScenario: null,
+  currentScenario: [],
   userScenarios: [],
   userReports: [],
   currentReport: {},

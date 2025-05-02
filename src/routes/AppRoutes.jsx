@@ -2,13 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PrivateRoute from './PrivateRoute';
-import Login from '../pages/login/login';
-import Create from '../pages/create-new-scenario/create-new';
-import ViewReport from '../pages/viewReport/viewReport';
-import Confirmation from '../pages/confirmation/confirmation';
-import Download from '../pages/download/download';
-import Dashboard from '../pages/dashboard/dashboard';
-import Scenario from '../pages/scenario1/scenario1';
+import Login from 'src/views/screens/login';
+import Dashboard from 'src/views/screens/dashboard';
+import Upload from 'src/views/screens/upload';
+import CreateScenario from 'src/views/screens/createScenario';
+import Reports from 'src/views/screens/reports';
 
 function AppRoutes() {
   const user = useSelector((state) => state.user);
@@ -20,49 +18,25 @@ function AppRoutes() {
         <Route
           path="/dashboard"
           element={
-            <PrivateRoute user={user}>
-              <Dashboard />
-            </PrivateRoute>
+            <PrivateRoute user={user} children={<Dashboard />} />
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+            <PrivateRoute user={user} children={<Upload />} />
           }
         />
         <Route
           path="/create"
           element={
-            <PrivateRoute user={user}>
-              <Create />
-            </PrivateRoute>
+            <PrivateRoute user={user} children={<CreateScenario />} />
           }
         />
         <Route
-          path="/viewReport"
+          path="/reports"
           element={
-            <PrivateRoute user={user}>
-              <ViewReport />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/scenario"
-          element={
-            <PrivateRoute user={user}>
-              <Scenario />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/confirmation"
-          element={
-            <PrivateRoute user={user}>
-              <Confirmation />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/download"
-          element={
-            <PrivateRoute user={user}>
-              <Download />
-            </PrivateRoute>
+            <PrivateRoute user={user} children={<Reports />} />
           }
         />
         <Route path="/*" element={<Navigate to={user?.token ? "/dashboard" : "/login"} />} />

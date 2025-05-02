@@ -1,0 +1,21 @@
+.accordion {
+  .accordion-collapse {
+    .accordion-body {
+      table {
+        tbody {
+          tr {
+            &:last-child {
+              td {
+                border: none;
+              }
+            }
+
+            input:disabled {
+              cursor: not-allowed;
+            }
+          }
+        }
+      }
+    }
+  }
+}

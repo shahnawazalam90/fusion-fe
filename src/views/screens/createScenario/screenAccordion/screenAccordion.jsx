@@ -1,11 +1,28 @@
+import { toTitleCase } from "src/utils.js";
 
-import React from "react";
+import './screenAccordion.scss';
 
-import { toTitleCase, getFieldName } from "src/utils";
+export default function ScreenAccordion({
+  screen,
+  screenNameID,
+  screenSelected,
+  toggleScreenSelection,
+  editEnabled,
+  onChange
+}) {
+  const getFieldName = (locator) => {
+    if (locator && locator.includes("]")) {
+      const startIndex = locator.lastIndexOf("=") + 1;
+      const endIndex = locator.lastIndexOf("]");
+      const fieldName = locator.substring(startIndex, endIndex);
+      return fieldName;
+    }
 
-export default function ScreenAccordion({ screen, screenNameID, actionsChecked, screenSelected, toggleAction, toggleScreenActions, onChange }) {
+    return locator;
+  };
+
   return (
-    <div className="accordion mb-3" id={`${screenNameID}parent`}>
+    <div className="accordion" id={`${screenNameID}parent`}>
       <div className="accordion-item">
         <h2 className="accordion-header d-flex align-items-center">
           <button
@@ -23,18 +40,19 @@ export default function ScreenAccordion({ screen, screenNameID, actionsChecked, 
               <span className="accordion-name">{toTitleCase(screen.screenName)}</span>
             </div>
           </button>
-          <input type="checkbox" className="form-check-input m-0 ms-1 me-3" checked={screenSelected} onChange={toggleScreenActions} />
+          {!editEnabled && (
+            <input type="checkbox" className="form-check-input m-0 ms-1 me-3" checked={screenSelected} onChange={toggleScreenSelection} />
+          )}
         </h2>
         <div
           id={`${screenNameID}accordion`}
-          className="accordion-collapse collapse"
+          className="accordion-collapse collapse p-0"
           data-bs-parent={`#${screenNameID}parent`}
         >
-          <div className="accordion-body">
-            <table className="table">
+          <div className="accordion-body border-0 py-2">
+            <table className="table m-0">
               <thead>
                 <tr>
-                  <th><input type="checkbox" checked={screenSelected} onChange={toggleScreenActions} /></th>
                   <th className="table-heading">Field Name</th>
                   <th className="table-heading">Value</th>
                 </tr>
@@ -42,10 +60,16 @@ export default function ScreenAccordion({ screen, screenNameID, actionsChecked, 
               <tbody>
                 {screen.actions.map(({ locator, value }, i) =>
                   <tr key={locator + i}>
-                    <th scope="row"><input type="checkbox" checked={actionsChecked[i] || false} onChange={() => toggleAction(i)} /></th>
                     <td className="table-content">{getFieldName(locator)}</td>
                     <td>
-                      <input type="text" placeholder="Enter text" className="form-control-table" value={value} onChange={({ target: { value } }) => onChange(i, value)} />
+                      <input
+                        type="text"
+                        placeholder="Enter text"
+                        className="form-control-table"
+                        value={editEnabled ? value : ''}
+                        disabled={!editEnabled}
+                        onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
+                      />
                     </td>
                   </tr>
                 )}

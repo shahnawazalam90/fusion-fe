@@ -1,0 +1,28 @@
+$scenario-card-gutter: 16px;
+
+.dashboard-container {
+  .dashboard-heading {
+    font-weight: 300;
+    font-size: 32px;
+  }
+
+  .user-scenario-container {
+    .scenario-grid-container {
+      gap: $scenario-card-gutter;
+
+      .scenario-card {
+        cursor: pointer;
+        width: calc((100% - #{$scenario-card-gutter} * 3)/4);
+
+        .scenario-card-title {
+          font-weight: 700;
+          font-size: 16px;
+        }
+        .scenario-card-description {
+          font-weight: 400;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

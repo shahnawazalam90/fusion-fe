@@ -1,6 +1,6 @@
 import { post, get } from './utils';
-import store from '../store';
-import { setUser, setCurrentScenario, setUserScenarios, setUserReports, setCurrentReport } from '../store/actions';
+import store from 'src/store';
+import { setUser, setUserScenarios, setUserReports, setCurrentReport } from 'src/store/actions';
 
 export const login = async (email, password) => {
   const url = '/api/v1/auth/login';
@@ -31,7 +31,6 @@ export const uploadTS = async (file) => {
         'Content-Type': 'multipart/form-data',
       },
     });
-    store.dispatch(setCurrentScenario(response.data));
     return response;
   } catch (error) {
     console.error('File upload failed:', error);
