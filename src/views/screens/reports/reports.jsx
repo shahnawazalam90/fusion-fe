@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
-
 import Modal from 'react-bootstrap/Modal';
+import { useSelector } from 'react-redux';
+
+import { notify } from 'src/notify';
+import { toTitleCase } from 'src/utils';
+import { getReports } from 'src/http/requests';
 
 import DefaultLayout from 'src/views/layouts/default';
 
 import './reports.scss';
 
 const Report = () => {
+  const userReports = useSelector((state) => state.userReports);
+
   const [reportURL, setReportURL] = useState(null);
+
+  useEffect(() => {
+    getReports();
+  }, []);
 
   useEffect(() => {
     if (reportURL) {
@@ -16,51 +26,56 @@ const Report = () => {
     }
   }, [reportURL]);
 
+  const refreshReports = () => {
+    notify.success('Reports have been refreshed');
+    getReports();
+  };
+
   return (
     <>
       <DefaultLayout>
         <div className='reports-container position-relative d-flex flex-column gap-4'>
           <p className='reports-heading m-0'>User Reports</p>
-          <div className='reports-table-container'>
-            <table className='reports-table table table-bordered'>
-              <thead>
-                <tr>
-                  <th>S. No</th>
-                  <th>Scenarios</th>
-                  <th>Status</th>
-                  <th>Executed At</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>Scenario 1</td>
-                  <td>In Progress</td>
-                  <td>2023-10-01 10:00 AM</td>
-                  <td>
-                    <i className="bi bi-arrow-clockwise"></i>
-                  </td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>
-                    <ul>
-                      <li>Scenario 1</li>
-                      <li>Scenario 2</li>
-                    </ul>
-                  </td>
-                  <td>Complete</td>
-                  <td>2023-10-01 10:00 AM</td>
-                  <td>
-                    <i className="bi bi-eye-fill text-primary" onClick={() => setReportURL('https://www.google.com/')} />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </DefaultLayout>
+          {userReports.length === 0 ? (
+            <div className='no-reports-container flex-grow-1 d-flex align-items-center justify-content-center'>
+              <p className='no-reports-text'>No reports available</p>
+            </div>
+          ) : (
+            <div className='reports-table-container'>
+              <table className='reports-table table table-bordered'>
+                <thead>
+                  <tr>
+                    <th>S. No</th>
+                    <th>Scenarios</th>
+                    <th>Status</th>
+                    <th>Executed At</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    userReports.map((report, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{report.scenarioIds.join()}</td>
+                        <td>{toTitleCase(report.status)}</td>
+                        <td>{new Date(report.executedAt).toLocaleString()}</td>
+                        <td>
+                          {report.status !== 'completed' ? (
+                            <i className="bi bi-arrow-clockwise" onClick={refreshReports}></i>
+                          ) : (
+                            <i className="bi bi-eye-fill text-primary" onClick={() => setReportURL(report.filePath)} />
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div >
+      </DefaultLayout >
       <Modal size='xl' centered show={!!reportURL} onHide={() => setReportURL(null)}>
         <Modal.Header closeButton>
           <Modal.Title>Report for Scenario 1, Scenario 2</Modal.Title>

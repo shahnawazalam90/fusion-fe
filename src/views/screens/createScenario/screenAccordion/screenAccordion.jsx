@@ -1,6 +1,7 @@
 import { toTitleCase } from "src/utils.js";
 
 import './screenAccordion.scss';
+import classNames from "classnames";
 
 export default function ScreenAccordion({
   screen,
@@ -10,23 +11,12 @@ export default function ScreenAccordion({
   editEnabled,
   onChange
 }) {
-  const getFieldName = (locator) => {
-    if (locator && locator.includes("]")) {
-      const startIndex = locator.lastIndexOf("=") + 1;
-      const endIndex = locator.lastIndexOf("]");
-      const fieldName = locator.substring(startIndex, endIndex);
-      return fieldName;
-    }
-
-    return locator;
-  };
-
   return (
     <div className="accordion" id={`${screenNameID}parent`}>
       <div className="accordion-item">
         <h2 className="accordion-header d-flex align-items-center">
           <button
-            className="accordion-button d-flex justify-content-between align-items-center"
+            className="accordion-button bg-transparent d-flex justify-content-between align-items-center"
             type="button"
             data-bs-toggle="collapse"
             data-bs-target={`#${screenNameID}accordion`}
@@ -46,7 +36,7 @@ export default function ScreenAccordion({
         </h2>
         <div
           id={`${screenNameID}accordion`}
-          className="accordion-collapse collapse p-0"
+          className={classNames("accordion-collapse collapse p-0", {'show': editEnabled})}
           data-bs-parent={`#${screenNameID}parent`}
         >
           <div className="accordion-body border-0 py-2">
@@ -58,14 +48,14 @@ export default function ScreenAccordion({
                 </tr>
               </thead>
               <tbody>
-                {screen.actions.map(({ locator, value }, i) =>
-                  <tr key={locator + i}>
-                    <td className="table-content">{getFieldName(locator)}</td>
+                {screen.actions.map(({ raw, options, value }, i) =>
+                  <tr key={screenNameID + raw + i}>
+                    <td className="table-content">{options?.name}</td>
                     <td>
                       <input
                         type="text"
                         placeholder="Enter text"
-                        className="form-control-table"
+                        className="form-control-table w-100"
                         value={editEnabled ? value : ''}
                         disabled={!editEnabled}
                         onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}

@@ -1,6 +1,14 @@
 .reports-container {
+  min-height: 100%;
+  
   .reports-heading {
     font-weight: 300;
     font-size: 32px;
+  }
+
+  .no-reports-container  {
+    .no-reports-text {
+      font-size: 20px;
+    }
   }
 }

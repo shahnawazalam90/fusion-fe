@@ -1,17 +1,33 @@
 .accordion {
-  .accordion-collapse {
-    .accordion-body {
-      table {
-        tbody {
-          tr {
-            &:last-child {
-              td {
-                border: none;
-              }
-            }
+  .accordion-item {
+    .accordion-header {
+      .accordion-button {
+        box-shadow: none;
 
-            input:disabled {
-              cursor: not-allowed;
+        &::after {
+          display: none;
+        }
+      }
+    }
+
+    .accordion-collapse {
+      border-top: 1px solid rgb(222, 226, 230);
+
+      .accordion-body {
+        table {
+          table-layout: fixed;
+
+          tbody {
+            tr {
+              &:last-child {
+                td {
+                  border: none;
+                }
+              }
+
+              input:disabled {
+                cursor: not-allowed;
+              }
             }
           }
         }

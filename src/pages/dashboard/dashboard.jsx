@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
-import { uploadTS, getUserScenarios, getReports, postReport, viewReport } from "../../http";
+import { uploadTS, getUserScenarios, postReport, viewReport } from "../../http";
 
 import './dashboard.css';
 import store from "../../store";
@@ -20,7 +20,6 @@ function Dashboard() {
 
   useEffect(() => {
     getUserScenarios();
-    getReports();
   }, []);
 
   const scenarioReport = useMemo(() => {
@@ -91,7 +90,6 @@ function Dashboard() {
           setUploadedReport(null);
           setSelectedScenario(null);
           getUserScenarios();
-          getReports();
           document.getElementById("uploadReportModalCloseBtn").click();
         } else {
           alert("Report upload failed. Please try again.");

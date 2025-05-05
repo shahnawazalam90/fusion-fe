@@ -1,5 +1,8 @@
 import axios from 'axios';
-import store from '../store';
+import store from 'src/store';
+import { notify } from 'src/notify';
+
+import { clearData } from "src/store/actions";
 
 const http = axios.create({
   baseURL: 'http://localhost:3000',
@@ -20,7 +23,15 @@ http.interceptors.request.use(
 
 http.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error)
+  (error) => {
+    if (error?.response?.data?.message === 'Token expired') {
+        // Handle token expiration here
+        store.dispatch(clearData());
+        notify.error('Session expired. Please log in again.');
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export default http;

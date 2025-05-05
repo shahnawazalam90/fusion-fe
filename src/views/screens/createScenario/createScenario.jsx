@@ -9,7 +9,7 @@ import store from 'src/store';
 import { notify } from 'src/notify';
 import { setCurrentScenarioValue } from 'src/store/actions';
 
-import { postScenario } from "src/http";
+import { postScenario, getLatestScenario } from "src/http";
 
 import DefaultLayout from 'src/views/layouts/default';
 import ScreenAccordion from './screenAccordion';
@@ -25,19 +25,15 @@ const CreateScenario = () => {
   const [scenarioName, setScenarioName] = useState('');
 
   useEffect(() => {
-    const updatedChecked = currentScenario.map(() => false);
-    setScreensChecked(updatedChecked);
+    getLatestScenario().then(screens => {
+      const updatedChecked = screens.map(() => false);
+      setScreensChecked(updatedChecked);
+    });
   }, []);
 
   const allActionsSelected = useMemo(() => {
     return screensChecked.find((screenChecked) => !screenChecked) === undefined;
   }, [screensChecked]);
-
-  const filteredScenarios = useMemo(() => {
-    if (!editEnabled) return currentScenario;
-
-    return currentScenario.filter((screen, i) => screensChecked[i]);
-  }, [editEnabled, currentScenario, screensChecked]);
 
   const checkAllActions = () => {
     const updatedChecked = screensChecked.map(() => !allActionsSelected);
@@ -90,64 +86,74 @@ const CreateScenario = () => {
       <div className='create-scenario-container position-relative d-flex flex-column gap-4'>
         <p className='create-scenario-heading m-0'>Create New Scenario</p>
 
-        <div className='scenario-list-container d-flex flex-column gap-1'>
-          <div className="d-flex align-items-center mb-3">
-            {!editEnabled ? (
-              <>
-                <label className="form-label-checkbox mb-0 me-2" htmlFor='select-all-checkbox'>Select All</label>
-                <input id='select-all-checkbox' type="checkbox" className="form-check-input mt-0" checked={allActionsSelected} onChange={() => checkAllActions()} />
-              </>
-            ) : (
-              <Form.Group className='mb-3'>
-                <Form.Label>Scenario Name <span className='text-danger'>*</span></Form.Label>
-                <Form.Control
-                  name='ScenarioName'
-                  type='text'
-                  placeholder='Scenario Name'
-                  value={scenarioName}
-                  onChange={(e) => setScenarioName(e.target.value)}
-                />
-              </Form.Group>
-            )}
+        {currentScenario.length === 0 ? (
+          <div className='no-scenario-container flex-grow-1 d-flex align-items-center justify-content-center'>
+            <p className='no-scenario-text'>No Scenario available. Please upload a spec file & then continue</p>
           </div>
+        ) : (
+          <>
+            <div className='scenario-list-container d-flex flex-column gap-1'>
+              <div className="d-flex align-items-center mb-3">
+                {!editEnabled ? (
+                  <>
+                    <label className="form-label-checkbox mb-0 me-2" htmlFor='select-all-checkbox'>Select All</label>
+                    <input id='select-all-checkbox' type="checkbox" className="form-check-input mt-0" checked={allActionsSelected} onChange={() => checkAllActions()} />
+                  </>
+                ) : (
+                  <Form.Group className='mb-3'>
+                    <Form.Label>Scenario Name <span className='text-danger'>*</span></Form.Label>
+                    <Form.Control
+                      name='ScenarioName'
+                      type='text'
+                      placeholder='Scenario Name'
+                      value={scenarioName}
+                      onChange={(e) => setScenarioName(e.target.value)}
+                    />
+                  </Form.Group>
+                )}
+              </div>
 
-          {filteredScenarios.map((screen, i) => {
-            const screenNameID = screen.screenName.replace(/\s+/g, '') + i;
-            return (
-              <ScreenAccordion
-                key={screen.screenName + screen.actions.length}
-                screen={screen}
-                screenNameID={screenNameID}
-                screenSelected={screensChecked[i] || false}
-                toggleScreenSelection={() => checkScreen(i)}
-                editEnabled={editEnabled}
-                onChange={(j, value) => handleChange(i, j, value)}
-              />
-            )
-          })}
-        </div>
+              {currentScenario.map((screen, i) => {
+                const screenNameID = screen.screenName.replace(/\s+/g, '') + i;
+                if (editEnabled && !screensChecked[i]) return null;
 
-        <div className='scenario-actions-container d-flex gap-3 justify-content-end'>
-          {!editEnabled ? (
-            <>
-              <Button variant='secondary' onClick={() => navigate('/dashboard')}>
-                Cancel
-              </Button>
-              <Button variant='primary' onClick={handleNext}>
-                Next
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant='secondary' onClick={() => setEditEnabled(false)}>
-                Back
-              </Button>
-              <Button variant='primary' onClick={handleSave}>
-                Save
-              </Button>
-            </>
-          )}
-        </div>
+                return (
+                  <ScreenAccordion
+                    key={screen.screenName + screen.actions.length + i}
+                    screen={screen}
+                    screenNameID={screenNameID}
+                    screenSelected={screensChecked[i] || false}
+                    toggleScreenSelection={() => checkScreen(i)}
+                    editEnabled={editEnabled}
+                    onChange={(j, value) => handleChange(i, j, value)}
+                  />
+                )
+              })}
+            </div>
+
+            <div className='scenario-actions-container d-flex gap-3 justify-content-end'>
+              {!editEnabled ? (
+                <>
+                  <Button variant='secondary' onClick={() => navigate('/dashboard')}>
+                    Cancel
+                  </Button>
+                  <Button variant='primary' onClick={handleNext}>
+                    Next
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant='secondary' onClick={() => setEditEnabled(false)}>
+                    Back
+                  </Button>
+                  <Button variant='primary' onClick={handleSave}>
+                    Save
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </DefaultLayout>
   );

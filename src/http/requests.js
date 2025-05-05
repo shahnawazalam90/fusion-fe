@@ -1,6 +1,6 @@
 import { post, get } from './utils';
 import store from 'src/store';
-import { setUser, setUserScenarios, setUserReports, setCurrentReport } from 'src/store/actions';
+import { setUser, setUserScenarios, setUserReports, setCurrentScenario } from 'src/store/actions';
 
 export const login = async (email, password) => {
   const url = '/api/v1/auth/login';
@@ -21,9 +21,9 @@ export const login = async (email, password) => {
 };
 
 export const uploadTS = async (file) => {
-  const url = '/api/v1/files/parseSpec';
+  const url = '/api/v1/specs/upload';
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('specFile', file);
 
   try {
     const response = await post(url, formData, {
@@ -43,10 +43,7 @@ export const getUserScenarios = async () => {
 
   try {
     const response = await get(url);
-    store.dispatch(setUserScenarios(response.data.map(scenario => ({
-      ...scenario,
-      jsonMetaData: JSON.parse(scenario.jsonMetaData),
-    }))));
+    store.dispatch(setUserScenarios(response.data));
     return response;
   } catch (error) {
     console.error('Get user scenarios request failed:', error);
@@ -86,29 +83,24 @@ export const getReports = async () => {
   }
 };
 
-export const postReport = async (scenarioId, file) => {
-  const url = '/api/v1/reports/';
-  const formData = new FormData();
-  formData.append('scenarioId', scenarioId);
-  formData.append('file', file);
+export const getLatestScenario = async () => {
+  const url = '/api/v1/specs/latest';
 
   try {
-    const response = await post(url, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response;
+    const response = await get(url);
+    const screens = response?.data?.specFile?.parsedJson?.screens;
+    store.dispatch(setCurrentScenario(screens));
+    return screens;
   } catch (error) {
-    console.error('Post report request failed:', error);
+    console.error('Get latest scenario request failed:', error);
     throw error;
   }
 };
 
-export const viewReport = async (scenarioName, reportId) => {
-  const url = '/api/v1/reports/view';
+export const executeScenario = async (scenarioIds) => {
+  const url = '/api/v1/reports/create';
   const payload = new URLSearchParams();
-  payload.append('reportId', reportId);
+  payload.append('scenarioIds', JSON.stringify(scenarioIds));
 
   try {
     const response = await post(url, payload, {
@@ -116,10 +108,9 @@ export const viewReport = async (scenarioName, reportId) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-    store.dispatch(setCurrentReport({scenarioName, reportURL: `http://localhost:3000${response.data[0].publicUrl}`}));
-    return response;
+    return response.data;
   } catch (error) {
-    console.error('View report request failed:', error);
+    console.error('Execute scenario request failed:', error);
     throw error;
   }
 };

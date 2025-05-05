@@ -3,9 +3,10 @@ import { useSelector } from "react-redux";
 
 import store from 'src/store';
 
-import './default.scss';
 import { clearData, setMenuVisibility } from "src/store/actions";
 import classNames from 'classnames';
+
+import './default.scss';
 
 const menuItems = [
   {

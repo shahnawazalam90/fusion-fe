@@ -3,10 +3,8 @@ import { useNavigate } from "react-router";
 
 import Button from 'react-bootstrap/Button';
 
-import store from 'src/store';
-import { setCurrentScenario } from 'src/store/actions';
 import { uploadTS } from "src/http";
-import { toTitleCase, getFieldName } from 'src/utils';
+import { notify } from 'src/notify';
 
 import DefaultLayout from 'src/views/layouts/default';
 
@@ -16,7 +14,6 @@ const Upload = () => {
   const navigate = useNavigate();
 
   const [uploadedFile, setUploadedFile] = useState(null);
-  const [parsedScenario, setParsedScenario] = useState(null);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -31,7 +28,9 @@ const Upload = () => {
     uploadTS(uploadedFile)
       .then((response) => {
         if (response.status === 'success') {
-          setParsedScenario(response.data);
+          setUploadedFile(null);
+          notify.success('Uploaded successfully!');
+          navigate('/dashboard');
         } else {
           alert("File upload failed. Please try again.");
         }
@@ -42,17 +41,11 @@ const Upload = () => {
       });
   }
 
-  const handleSave = () => {
-    store.dispatch(setCurrentScenario(parsedScenario)); // Replace with http save call
-    setUploadedFile(null);
-    navigate('/dashboard');
-  };
-
   return (
     <DefaultLayout>
       <div className='upload-container position-relative d-flex flex-column gap-4'>
         <p className='upload-heading m-0'>Upload TS File</p>
-        {(!uploadedFile && !parsedScenario) && (
+        {(!uploadedFile) ? (
           <div className='upload-file-container d-flex flex-column gap-2'>
             <div
               className='upload-file-wrapper p-5 d-flex flex-column gap-3 align-items-center justify-content-center rounded-4'
@@ -86,8 +79,7 @@ const Upload = () => {
               <p className="upload-file-text text-secondary m-0">Maximum file size: 80MB</p>
             </div>
           </div>
-        )}
-        {(uploadedFile && !parsedScenario) && (
+        ) : (
           <>
             <div className="uploaded-file-wrapper d-flex justify-content-between align-items-center rounded-3 p-3">
               <div className="d-flex align-items-center d-flex gap-3 align-items-center">
@@ -113,44 +105,7 @@ const Upload = () => {
                 Cancel
               </Button>
               <Button variant='primary' disabled={!uploadedFile} onClick={handleFileParse}>
-                Parse File
-              </Button>
-            </div>
-          </>
-        )}
-        {(uploadedFile && parsedScenario) && (
-          <>
-            <div className="parsed-file-wrapper d-flex justify-content-between align-items-center rounded-3 p-3">
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th scope="col">Screen Name</th>
-                    <th scope="col">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {parsedScenario.map(({ screenName, actions }, i) => (
-                    actions.map((action, j) => (
-                      <tr key={screenName + i + j}>
-                        {j === 0 && (
-                          <td className="parsed-file-screen-name" rowSpan={actions.length}>
-                            {toTitleCase(screenName)}
-                          </td>
-                        )}
-                        <td>{getFieldName(action.locator)}</td>
-                      </tr>
-                    ))
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className='parsed-file-actions d-flex gap-3 justify-content-end'>
-              <Button variant='secondary' onClick={() => setParsedScenario(null)}>
-                Cancel
-              </Button>
-              <Button variant='primary' disabled={!parsedScenario} onClick={handleSave}>
-                Save
+                Upload
               </Button>
             </div>
           </>
