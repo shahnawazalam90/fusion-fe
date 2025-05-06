@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -37,12 +37,14 @@ const Dashboard = () => {
       });
   };
 
+  const disableScenarioActions = useMemo(() => !Object.values(selectedScenarios).find(x => x), [selectedScenarios]);
+
   return (
     <DefaultLayout>
       <>
-        <div className='dashboard-container position-relative d-flex flex-column gap-4'>
+        <div className='dashboard-container flex-grow-1 position-relative d-flex flex-column gap-4'>
           <p className='dashboard-heading m-0'>Scenario Management</p>
-          <div className='user-scenario-container d-flex flex-column gap-3'>
+          <div className='user-scenario-container flex-grow-1 d-flex flex-column gap-3'>
             <div className='scenario-controls-container d-flex align-items-center justify-content-end'>
               <Button variant='primary' onClick={() => navigate('/create')}>
                 <i className='create-new-icon bi bi-plus-circle me-2' />
@@ -69,27 +71,30 @@ const Dashboard = () => {
                 <Button variant='primary' onClick={() => setIsFilterVisible(!isFilterVisible)}>Filter</Button>
               </div> */}
             </div>
-            <div className='scenario-grid-container d-flex flex-wrap'>
-              {userScenarios.map((scenario) => (
-                <Card className='scenario-card' key={scenario.id} onClick={() => handleScenarioClick(scenario.id)}>
-                  <Card.Body>
-                    <Card.Title className='scenario-card-title d-flex align-items-center gap-2'>
-                      <i className={classNames('bi', { 'bi-circle': !selectedScenarios[scenario.id], 'bi-record-circle-fill text-primary': selectedScenarios[scenario.id] })} />
-                      <span>{scenario.name}</span>
-                    </Card.Title>
-                    <Card.Text className='scenario-card-details'>
-                      <span className='scenario-text d-block mb-0'>{JSON.parse(scenario.jsonMetaData)?.length} screen(s)</span>
-                      <span className='scenario-text mb-0'>{new Date(scenario.createdAt).toLocaleString()}</span>
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              ))}
+            <div className='scenario-grid-container flex-grow-1'>
+              <div className='scenario-grid-wrapper align-items-start d-flex flex-wrap'>
+                {userScenarios.map((scenario) => (
+                  <Card className='scenario-card' key={scenario.id} onClick={() => handleScenarioClick(scenario.id)}>
+                    <Card.Body>
+                      <Card.Title className='scenario-card-title d-flex align-items-center justify-content-between gap-2'>
+                        <span>{scenario.name}</span>
+                        <i className={classNames('bi', { 'bi-square': !selectedScenarios[scenario.id], 'bi-check-square-fill text-primary': selectedScenarios[scenario.id] })} />
+                      </Card.Title>
+                      <Card.Text className='scenario-card-details'>
+                        <span className='scenario-text d-block mb-0'>{JSON.parse(scenario.jsonMetaData)?.length} screen(s)</span>
+                        <span className='scenario-text mb-0'>{new Date(scenario.createdAt).toLocaleString()}</span>
+                      </Card.Text>
+                    </Card.Body>
+                  </Card>
+                ))}
+
+              </div>
             </div>
             <div className='dashboard-actions-container d-flex justify-content-end gap-3'>
-              <Button variant='secondary' onClick={() => setSelectedScenarios([])} disabled={!Object.keys(selectedScenarios).length}>
+              <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => setSelectedScenarios({})} disabled={disableScenarioActions}>
                 Clear Selection
               </Button>
-              <Button variant='primary' onClick={handleScenarioExecute} disabled={!Object.keys(selectedScenarios).length}>
+              <Button variant='primary' onClick={handleScenarioExecute} disabled={disableScenarioActions}>
                 Execute
               </Button>
             </div>

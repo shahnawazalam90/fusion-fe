@@ -1,5 +1,4 @@
 .create-scenario-container {
-
   .create-scenario-heading {
     font-weight: 300;
     font-size: 32px;
@@ -8,6 +7,17 @@
   .no-scenario-container {
     .no-scenario-text {
       font-size: 20px;
+    }
+  }
+
+  .scenario-list-container {
+    #select-all-checkbox {
+      width: 24px;
+      height: 24px;
+
+      &:checked {
+        background-color: #17567C;
+      }
     }
   }
 }

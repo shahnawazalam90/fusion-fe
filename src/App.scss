@@ -1,0 +1,10 @@
+$theme-colors: (
+  "primary": #195F8A,
+  "secondary": #F6F7F8,
+);
+
+@import "bootstrap/scss/bootstrap";
+
+#root {
+  font-family: "Roboto", sans-serif;
+}

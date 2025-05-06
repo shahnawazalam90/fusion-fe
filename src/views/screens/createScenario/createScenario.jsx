@@ -97,7 +97,7 @@ const CreateScenario = () => {
                 {!editEnabled ? (
                   <>
                     <label className="form-label-checkbox mb-0 me-2" htmlFor='select-all-checkbox'>Select All</label>
-                    <input id='select-all-checkbox' type="checkbox" className="form-check-input mt-0" checked={allActionsSelected} onChange={() => checkAllActions()} />
+                    <input id='select-all-checkbox' type="checkbox" className="form-check-input mt-0 border-dark-subtle rounded-1" checked={allActionsSelected} onChange={() => checkAllActions()} />
                   </>
                 ) : (
                   <Form.Group className='mb-3'>
@@ -134,7 +134,7 @@ const CreateScenario = () => {
             <div className='scenario-actions-container d-flex gap-3 justify-content-end'>
               {!editEnabled ? (
                 <>
-                  <Button variant='secondary' onClick={() => navigate('/dashboard')}>
+                  <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => navigate('/dashboard')}>
                     Cancel
                   </Button>
                   <Button variant='primary' onClick={handleNext}>
@@ -143,7 +143,7 @@ const CreateScenario = () => {
                 </>
               ) : (
                 <>
-                  <Button variant='secondary' onClick={() => setEditEnabled(false)}>
+                  <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => setEditEnabled(false)}>
                     Back
                   </Button>
                   <Button variant='primary' onClick={handleSave}>

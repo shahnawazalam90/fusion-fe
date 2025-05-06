@@ -9,6 +9,10 @@
     box-shadow: 0px 2px 6px 0px #0000001A;
     z-index: 9;
 
+    .header-logo {
+      height: 40px;
+    }
+
     .header-menu-button,
     .header-logout-button {
       border: none;
@@ -37,6 +41,7 @@
       background: #17567C;
       border-radius: 10px;
       transition: left 0.3s ease-in-out;
+      z-index: 9;
 
       &.active {
         left: $menu-gutter;
@@ -70,5 +75,11 @@
       padding: $body-padding;      
       transition: padding 0.3s ease-in-out;
     }
+  }
+
+  .footer-container {
+    height: $footer-height;
+    background-color: #F9F9F9;
+    box-shadow: 0px -2px 6px 0px #0000001A;
   }
 }

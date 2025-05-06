@@ -101,7 +101,7 @@ const Upload = () => {
               />
             </div>
             <div className='upload-file-actions d-flex gap-3 justify-content-end'>
-              <Button variant='secondary' onClick={() => setUploadedFile(null)}>
+              <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => setUploadedFile(null)}>
                 Cancel
               </Button>
               <Button variant='primary' disabled={!uploadedFile} onClick={handleFileParse}>

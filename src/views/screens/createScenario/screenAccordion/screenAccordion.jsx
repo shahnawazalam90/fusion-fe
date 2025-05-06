@@ -25,18 +25,18 @@ export default function ScreenAccordion({
           >
             <div className="d-flex align-items-center">
               <span className="me-2">
-                <img src="../../../src/assets/DownArrow.png" alt="arrow" />
+                <i className="bi bi-chevron-down" />
               </span>
               <span className="accordion-name">{toTitleCase(screen.screenName)}</span>
             </div>
           </button>
           {!editEnabled && (
-            <input type="checkbox" className="form-check-input m-0 ms-1 me-3" checked={screenSelected} onChange={toggleScreenSelection} />
+            <input type="checkbox" className="accordion-checkbox form-check-input m-0 ms-1 me-3 border-dark-subtle rounded-1" checked={screenSelected} onChange={toggleScreenSelection} />
           )}
         </h2>
         <div
           id={`${screenNameID}accordion`}
-          className={classNames("accordion-collapse collapse p-0", {'show': editEnabled})}
+          className={classNames("accordion-collapse collapse p-0", { 'show': editEnabled })}
           data-bs-parent={`#${screenNameID}parent`}
         >
           <div className="accordion-body border-0 py-2">
@@ -48,18 +48,21 @@ export default function ScreenAccordion({
                 </tr>
               </thead>
               <tbody>
-                {screen.actions.map(({ raw, options, value }, i) =>
+                {screen.actions.map(({ raw, options, value, action }, i) =>
                   <tr key={screenNameID + raw + i}>
+                    {console.log(action)}
                     <td className="table-content">{options?.name}</td>
                     <td>
-                      <input
-                        type="text"
-                        placeholder="Enter text"
-                        className="form-control-table w-100"
-                        value={editEnabled ? value : ''}
-                        disabled={!editEnabled}
-                        onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
-                      />
+                      {['fill', 'selectOption'].includes(action) && (
+                        <input
+                          type="text"
+                          placeholder="Enter text"
+                          className="form-control-table w-100"
+                          value={editEnabled ? value : ''}
+                          disabled={!editEnabled}
+                          onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
+                        />
+                      )}
                     </td>
                   </tr>
                 )}

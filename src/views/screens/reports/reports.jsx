@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { useSelector } from 'react-redux';
 
@@ -11,9 +12,11 @@ import DefaultLayout from 'src/views/layouts/default';
 import './reports.scss';
 
 const Report = () => {
+  const userScenarios = useSelector((state) => state.userScenarios);
   const userReports = useSelector((state) => state.userReports);
 
   const [reportURL, setReportURL] = useState(null);
+  const [disableRefresh, setDisableRefresh] = useState(false);
 
   useEffect(() => {
     getReports();
@@ -26,9 +29,15 @@ const Report = () => {
     }
   }, [reportURL]);
 
+  const scenarioIdMap = useMemo(() => {
+    return Object.fromEntries(userScenarios.map(({ id, name }) => [id, name]))
+  }, [userScenarios]);
+
   const refreshReports = () => {
+    setDisableRefresh(true);
     notify.success('Reports have been refreshed');
     getReports();
+    setTimeout(() => setDisableRefresh(false), 10000);
   };
 
   return (
@@ -41,30 +50,37 @@ const Report = () => {
               <p className='no-reports-text'>No reports available</p>
             </div>
           ) : (
-            <div className='reports-table-container'>
+            <div className='reports-table-container d-flex flex-column gap-3'>
+              <div className='reports-actions-container d-flex justify-content-end'>
+                <Button variant='primary' disabled={disableRefresh} onClick={refreshReports}>
+                  <i className="bi bi-arrow-clockwise me-1" />
+                  Refresh
+                </Button>
+              </div>
               <table className='reports-table table table-bordered'>
                 <thead>
                   <tr>
-                    <th>S. No</th>
-                    <th>Scenarios</th>
-                    <th>Status</th>
-                    <th>Executed At</th>
-                    <th>Actions</th>
+                    <th className='text-nowrap'>S. No</th>
+                    <th className='w-100'>Scenarios</th>
+                    <th className='text-nowrap'>Status</th>
+                    <th className='text-nowrap'>Executed At</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {
                     userReports.map((report, index) => (
                       <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>{report.scenarioIds.join()}</td>
-                        <td>{toTitleCase(report.status)}</td>
-                        <td>{new Date(report.executedAt).toLocaleString()}</td>
-                        <td>
-                          {report.status !== 'completed' ? (
-                            <i className="bi bi-arrow-clockwise" onClick={refreshReports}></i>
-                          ) : (
-                            <i className="bi bi-eye-fill text-primary" onClick={() => setReportURL(report.filePath)} />
+                        <td className='text-nowrap'>{index + 1}</td>
+                        <td className='w-100'>{report.scenarioIds.map(id => scenarioIdMap[id]).join(', ')}
+                        </td>
+                        <td className='text-nowrap'>{toTitleCase(report.status)}</td>
+                        <td className='text-nowrap'>{new Date(report.executedAt).toLocaleString()}</td>
+                        <td className='text-nowrap'>
+                          {report.status === 'completed' && (
+                            <Button variant='primary' size='sm' onClick={() => setReportURL(report.filePath)}>
+                              View Report
+                            </Button>
                           )}
                         </td>
                       </tr>

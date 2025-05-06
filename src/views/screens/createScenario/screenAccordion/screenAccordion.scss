@@ -8,6 +8,15 @@
           display: none;
         }
       }
+
+      .accordion-checkbox {
+        width: 24px;
+        height: 24px;
+  
+        &:checked {
+          background-color: #17567C;
+        }
+      }
     }
 
     .accordion-collapse {
