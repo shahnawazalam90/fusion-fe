@@ -23,10 +23,12 @@ const CreateScenario = () => {
   const [screensChecked, setScreensChecked] = useState([]);
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
+  const [url, setUrl] = useState('')
 
   useEffect(() => {
-    getLatestScenario().then(screens => {
-      const updatedChecked = screens.map(() => false);
+    getLatestScenario().then(result => {
+      const updatedChecked = result?.screens.map(() => false);
+      setUrl(result?.url)
       setScreensChecked(updatedChecked);
     });
   }, []);
@@ -66,7 +68,7 @@ const CreateScenario = () => {
       return;
     }
 
-    postScenario(scenarioName, JSON.stringify(currentScenario.filter((_, i) => screensChecked[i])))
+    postScenario(scenarioName, url, JSON.stringify(currentScenario.filter((_, i) => screensChecked[i])))
       .then((res) => {
         if (res.status === 'success') {
           notify.success('Scenario created successfully!');

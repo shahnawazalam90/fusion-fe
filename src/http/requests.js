@@ -51,10 +51,11 @@ export const getUserScenarios = async () => {
   }
 };
 
-export const postScenario = async (name, jsonMetaData) => {
+export const postScenario = async (name, screenUrl, jsonMetaData) => {
   const url = '/api/v1/scenarios/';
   const payload = new URLSearchParams();
   payload.append('name', name);
+  payload.append('url', screenUrl);
   payload.append('jsonMetaData', jsonMetaData);
 
   try {
@@ -89,8 +90,9 @@ export const getLatestScenario = async () => {
   try {
     const response = await get(url);
     const screens = response?.data?.specFile?.parsedJson?.screens;
+    const screenUrl = response?.data?.specFile?.url;
     store.dispatch(setCurrentScenario(screens));
-    return screens;
+    return {screens, url: screenUrl};
   } catch (error) {
     console.error('Get latest scenario request failed:', error);
     throw error;
