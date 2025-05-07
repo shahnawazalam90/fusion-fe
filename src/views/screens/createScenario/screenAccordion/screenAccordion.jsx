@@ -49,7 +49,7 @@ export default function ScreenAccordion({
               </thead>
               <tbody>
                 {screen.actions.map(({ raw, options, selector, value, action }, i) => {
-                  if (options?.name === undefined) return null;
+                  if (options === undefined) return null;
 
                   return (
                     <tr key={screenNameID + raw + i}>
