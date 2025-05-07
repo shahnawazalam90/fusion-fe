@@ -31,9 +31,26 @@ const Dashboard = () => {
 
   const handleScenarioExecute = () => {
     executeScenario(Object.keys(selectedScenarios))
-      .then(() => {
-        setSelectedScenarios({});
-        notify.success('Scenarios started executing successfully!');
+      .then(({ status, data }) => {
+        if (status === 'success') {
+          setSelectedScenarios({});
+          notify.success((t) => (
+            <div className='d-flex align-items-center gap-2'>
+              <span className='text-nowrap'>Scenarios started executing successfully!</span>
+              <Button className='text-nowrap' variant='primary' size='sm' onClick={async () => {
+                await navigator.clipboard.writeText(data.scenarioFile);
+                notify.dismiss(t.id)
+                notify.success('Copied successfully!');
+              }}>
+                Copy Scenario ID
+              </Button>
+            </div>
+          ), {
+            duration: 5000, style: {
+              maxWidth: '500px',
+            }
+          });
+        }
       });
   };
 

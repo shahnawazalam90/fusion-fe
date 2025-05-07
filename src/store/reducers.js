@@ -19,14 +19,16 @@ const rootReducer = (state = initialState, action) => {
         const { parentIndex, childIndex, value } = action.payload;
 
         // Create a deep copy of currentScenario
-        const currentScenario = state.currentScenario.map((scenario, index) => 
+        const currentScenario = { ...state.currentScenario };
+
+        currentScenario.screens = currentScenario.screens.map((scenario, index) =>
           index === parentIndex
             ? {
-                ...scenario,
-                actions: scenario.actions.map((action, idx) =>
-                  idx === childIndex ? { ...action, value } : action
-                ),
-              }
+              ...scenario,
+              actions: scenario.actions.map((action, idx) =>
+                idx === childIndex ? { ...action, value } : action
+              ),
+            }
             : scenario
         );
 
@@ -37,12 +39,12 @@ const rootReducer = (state = initialState, action) => {
     case SET_USER_REPORTS:
       return { ...state, userReports: action.payload };
     case SET_CURRENT_REPORT:
-      return { 
-        ...state, 
-        currentReport: { 
-          scenarioName: action.payload.scenarioName, 
-          reportURL: action.payload.reportURL 
-        } 
+      return {
+        ...state,
+        currentReport: {
+          scenarioName: action.payload.scenarioName,
+          reportURL: action.payload.reportURL
+        }
       };
     default:
       return state;

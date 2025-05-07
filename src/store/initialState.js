@@ -2,7 +2,7 @@ const initialState = {
   menu_visibility: true,
   user: {},
   posts: [],
-  currentScenario: [],
+  currentScenario: {url: '', screens: []},
   userScenarios: [],
   userReports: [],
   currentReport: {},

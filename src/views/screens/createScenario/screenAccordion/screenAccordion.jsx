@@ -50,7 +50,6 @@ export default function ScreenAccordion({
               <tbody>
                 {screen.actions.map(({ raw, options, value, action }, i) =>
                   <tr key={screenNameID + raw + i}>
-                    {console.log(action)}
                     <td className="table-content">{options?.name}</td>
                     <td>
                       {['fill', 'selectOption'].includes(action) && (

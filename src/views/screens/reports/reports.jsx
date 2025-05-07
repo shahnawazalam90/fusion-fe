@@ -25,7 +25,7 @@ const Report = () => {
   useEffect(() => {
     if (reportURL) {
       var iframe = document.getElementById('reportiframe');
-      iframe.src = reportURL;
+      iframe.src = 'http://localhost:3000/' + reportURL;
     }
   }, [reportURL]);
 
@@ -77,14 +77,14 @@ const Report = () => {
                         <td className='text-nowrap'>{toTitleCase(report.status)}</td>
                         <td className='text-nowrap'>{new Date(report.executedAt).toLocaleString()}</td>
                         <td className='text-nowrap'>
-                          {report.status === 'completed' && (
+                          {report.filePath !== null && (
                             <Button variant='primary' size='sm' onClick={() => setReportURL(report.filePath)}>
                               View Report
                             </Button>
                           )}
                         </td>
                       </tr>
-                    ))
+                    )).reverse()
                   }
                 </tbody>
               </table>

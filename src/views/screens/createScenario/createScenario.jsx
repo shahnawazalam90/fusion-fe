@@ -23,12 +23,10 @@ const CreateScenario = () => {
   const [screensChecked, setScreensChecked] = useState([]);
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
-  const [url, setUrl] = useState('')
 
   useEffect(() => {
-    getLatestScenario().then(result => {
-      const updatedChecked = result?.screens.map(() => false);
-      setUrl(result?.url)
+    getLatestScenario().then(({ screens }) => {
+      const updatedChecked = screens.map(() => false);
       setScreensChecked(updatedChecked);
     });
   }, []);
@@ -68,7 +66,7 @@ const CreateScenario = () => {
       return;
     }
 
-    postScenario(scenarioName, url, JSON.stringify(currentScenario.filter((_, i) => screensChecked[i])))
+    postScenario(scenarioName, currentScenario?.url, JSON.stringify(currentScenario?.screens.filter((_, i) => screensChecked[i])))
       .then((res) => {
         if (res.status === 'success') {
           notify.success('Scenario created successfully!');
@@ -88,7 +86,7 @@ const CreateScenario = () => {
       <div className='create-scenario-container position-relative d-flex flex-column gap-4'>
         <p className='create-scenario-heading m-0'>Create New Scenario</p>
 
-        {currentScenario.length === 0 ? (
+        {currentScenario?.screens?.length === 0 ? (
           <div className='no-scenario-container flex-grow-1 d-flex align-items-center justify-content-center'>
             <p className='no-scenario-text'>No Scenario available. Please upload a spec file & then continue</p>
           </div>
@@ -115,7 +113,7 @@ const CreateScenario = () => {
                 )}
               </div>
 
-              {currentScenario.map((screen, i) => {
+              {currentScenario?.screens?.map((screen, i) => {
                 const screenNameID = screen.screenName.replace(/\s+/g, '') + i;
                 if (editEnabled && !screensChecked[i]) return null;
 

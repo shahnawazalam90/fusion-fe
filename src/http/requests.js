@@ -91,7 +91,7 @@ export const getLatestScenario = async () => {
     const response = await get(url);
     const screens = response?.data?.specFile?.parsedJson?.screens;
     const screenUrl = response?.data?.specFile?.url;
-    store.dispatch(setCurrentScenario(screens));
+    store.dispatch(setCurrentScenario({screens, url: screenUrl}));
     return {screens, url: screenUrl};
   } catch (error) {
     console.error('Get latest scenario request failed:', error);
@@ -110,7 +110,7 @@ export const executeScenario = async (scenarioIds) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Execute scenario request failed:', error);
     throw error;

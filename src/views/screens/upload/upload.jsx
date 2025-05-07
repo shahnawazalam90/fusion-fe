@@ -60,7 +60,7 @@ const Upload = () => {
               }}
               onDragOver={(e) => e.preventDefault()}
             >
-              <i class="upload-file-icon bi bi-file-earmark-arrow-up text-secondary"></i>
+              <i className="upload-file-icon bi bi-file-earmark-arrow-up text-secondary"></i>
               <h3 className="upload-file-text m-0">Drag and drop TS file here</h3>
               <p className="upload-file-text m-0">OR</p>
               <label htmlFor="tsFileUpload" className="btn btn-primary">
