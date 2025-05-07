@@ -25,7 +25,7 @@ const Report = () => {
   useEffect(() => {
     if (reportURL) {
       var iframe = document.getElementById('reportiframe');
-      iframe.src = 'http://localhost:3000/' + reportURL;
+      iframe.src = 'http://localhost:3000' + reportURL;
     }
   }, [reportURL]);
 
@@ -92,7 +92,7 @@ const Report = () => {
           )}
         </div >
       </DefaultLayout >
-      <Modal size='xl' centered show={!!reportURL} onHide={() => setReportURL(null)}>
+      <Modal fullscreen centered show={!!reportURL} onHide={() => setReportURL(null)}>
         <Modal.Header closeButton>
           <Modal.Title>Report for Scenario 1, Scenario 2</Modal.Title>
         </Modal.Header>
