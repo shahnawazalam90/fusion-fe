@@ -38,7 +38,7 @@ const Dashboard = () => {
             <div className='d-flex align-items-center gap-2'>
               <span className='text-nowrap'>Scenarios started executing successfully!</span>
               <Button className='text-nowrap' variant='primary' size='sm' onClick={async () => {
-                await navigator.clipboard.writeText(data.scenarioFile);
+                await navigator.clipboard.writeText(data.scenarioFile.replace(/^.*[\\/]/, ''));
                 notify.dismiss(t.id)
                 notify.success('Copied successfully!');
               }}>

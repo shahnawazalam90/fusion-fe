@@ -57,6 +57,7 @@ const CreateScenario = () => {
       notify.error('At least one screen is required.');
       return;
     }
+    window.scrollTo(0, 0);
     setEditEnabled(true);
   };
 
