@@ -48,23 +48,27 @@ export default function ScreenAccordion({
                 </tr>
               </thead>
               <tbody>
-                {screen.actions.map(({ raw, options, value, action }, i) =>
-                  <tr key={screenNameID + raw + i}>
-                    <td className="table-content">{options?.name}</td>
-                    <td>
-                      {['fill', 'selectOption'].includes(action) && (
-                        <input
-                          type="text"
-                          placeholder="Enter text"
-                          className="form-control-table w-100"
-                          value={editEnabled ? value : ''}
-                          disabled={!editEnabled}
-                          onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
-                        />
-                      )}
-                    </td>
-                  </tr>
-                )}
+                {screen.actions.map(({ raw, options, selector, value, action }, i) => {
+                  if (options?.name === undefined) return null;
+
+                  return (
+                    <tr key={screenNameID + raw + i}>
+                      <td className="table-content">{options?.name || selector}</td>
+                      <td>
+                        {['fill', 'selectOption'].includes(action) && (
+                          <input
+                            type="text"
+                            placeholder="Enter text"
+                            className="form-control-table w-100"
+                            value={editEnabled ? value : ''}
+                            disabled={!editEnabled}
+                            onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
