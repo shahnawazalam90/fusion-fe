@@ -84,7 +84,7 @@ const Report = () => {
                           )}
                         </td>
                       </tr>
-                    )).reverse()
+                    ))
                   }
                 </tbody>
               </table>
@@ -94,7 +94,7 @@ const Report = () => {
       </DefaultLayout >
       <Modal fullscreen centered show={!!reportURL} onHide={() => setReportURL(null)}>
         <Modal.Header closeButton>
-          <Modal.Title>Report for Scenario 1, Scenario 2</Modal.Title>
+          <Modal.Title>Report</Modal.Title>
         </Modal.Header>
         <Modal.Body>
 
