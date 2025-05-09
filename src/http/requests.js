@@ -76,7 +76,7 @@ export const getReports = async () => {
 
   try {
     const response = await get(url);
-    store.dispatch(setUserReports(response.data));
+    store.dispatch(setUserReports(response.data.reports));
     return response;
   } catch (error) {
     console.error('Get reports request failed:', error);

@@ -69,7 +69,7 @@ const Report = () => {
                 </thead>
                 <tbody>
                   {
-                    userReports.map((report, index) => (
+                    userReports?.map((report, index) => (
                       <tr key={index}>
                         <td className='text-nowrap'>{index + 1}</td>
                         <td className='w-100'>{report.scenarioIds.map(id => scenarioIdMap[id]).join(', ')}
