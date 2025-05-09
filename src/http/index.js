@@ -6,4 +6,5 @@ export {
   getLatestScenario,
   postScenario,
   executeScenario,
+  getScenariosJSON,
 } from './requests';

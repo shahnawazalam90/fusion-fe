@@ -37,6 +37,10 @@
               input:disabled {
                 cursor: not-allowed;
               }
+
+              &.no-fields-row:not(:first-child) {
+                display: none;
+              }
             }
           }
         }

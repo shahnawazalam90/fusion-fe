@@ -116,3 +116,21 @@ export const executeScenario = async (scenarioIds) => {
     throw error;
   }
 };
+
+export const getScenariosJSON = async (scenarioIds) => {
+  const url = '/api/v1/reports/get-json';
+  const payload = new URLSearchParams();
+  payload.append('scenarioIds', JSON.stringify(scenarioIds));
+
+  try {
+    const response = await post(url, payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Get scenarios JSON request failed:', error);
+    throw error;
+  }
+};

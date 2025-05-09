@@ -11,6 +11,26 @@ export default function ScreenAccordion({
   editEnabled,
   onChange
 }) {
+  const screenActionsRows = screen.actions.map(({ raw, options, selector, value, action }, i) => {
+    if (!['fill', 'selectOption'].includes(action)) return null;
+
+    return (
+      <tr key={screenNameID + raw + i}>
+        <td className="table-content">{toTitleCase(options?.name || selector)}</td>
+        <td>
+          <input
+            type="text"
+            placeholder="Enter text"
+            className="form-control-table w-100"
+            value={editEnabled ? value : ''}
+            disabled={!editEnabled}
+            onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
+          />
+        </td>
+      </tr>
+    )
+  }).filter(actionRow => actionRow !== null);
+
   return (
     <div className="accordion" id={`${screenNameID}parent`}>
       <div className="accordion-item">
@@ -40,37 +60,21 @@ export default function ScreenAccordion({
           data-bs-parent={`#${screenNameID}parent`}
         >
           <div className="accordion-body border-0 py-2">
-            <table className="table m-0">
-              <thead>
-                <tr>
-                  <th className="table-heading">Field Name</th>
-                  <th className="table-heading">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {screen.actions.map(({ raw, options, selector, value, action }, i) => {
-                  if (options === undefined) return null;
-
-                  return (
-                    <tr key={screenNameID + raw + i}>
-                      <td className="table-content">{options?.name || selector}</td>
-                      <td>
-                        {['fill', 'selectOption'].includes(action) && (
-                          <input
-                            type="text"
-                            placeholder="Enter text"
-                            className="form-control-table w-100"
-                            value={editEnabled ? value : ''}
-                            disabled={!editEnabled}
-                            onChange={({ target: { value } }) => editEnabled ? onChange(i, value) : null}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+            {screenActionsRows.length !== 0 ? (
+              <table className="table m-0">
+                <thead>
+                  <tr>
+                    <th className="table-heading">Field Name</th>
+                    <th className="table-heading">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {screenActionsRows}
+                </tbody>
+              </table>
+            ) : (
+              <p className="m-0 p-3 text-center">No Text Fields Found</p>
+            )}
           </div>
         </div>
       </div>

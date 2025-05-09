@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 
 import { uploadTS } from "src/http";
 import { notify } from 'src/notify';
+import { downloadFile } from 'src/utils';
 
 import DefaultLayout from 'src/views/layouts/default';
 
@@ -28,8 +29,29 @@ const Upload = () => {
     uploadTS(uploadedFile)
       .then((response) => {
         if (response.status === 'success') {
+          notify.success((t) => (
+            <div className='d-flex align-items-center gap-2'>
+              <span className='text-nowrap'>Uploaded successfully!</span>
+              <Button className='text-nowrap' variant='primary' size='sm' onClick={async () => {
+                try {
+                  await downloadFile(response.data.specFile, `${response.data.specFile.originalName}.json`, 4);
+                  notify.success('Downloaded successfully!');
+                } catch (err) {
+                  notify.error('Could not download the file due to some error.');
+                  console.log('Unable to download file. Error: ', err);
+                } finally {
+                  notify.dismiss(t.id)
+                }
+              }}>
+                Download Parsed JSON
+              </Button>
+            </div>
+          ), {
+            duration: 5000, style: {
+              maxWidth: '500px',
+            }
+          });
           setUploadedFile(null);
-          notify.success('Uploaded successfully!');
           navigate('/dashboard');
         } else {
           alert("File upload failed. Please try again.");

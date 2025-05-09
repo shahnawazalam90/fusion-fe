@@ -22,3 +22,14 @@ export function debounce(func, delay) {
     timer = setTimeout(() => func.apply(this, args), delay);
   };
 }
+
+export function downloadFile(content, filename, indentSpaces) {
+  const formattedContent = JSON.stringify(content, null, indentSpaces);
+  const blob = new Blob([formattedContent], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+  return;
+}

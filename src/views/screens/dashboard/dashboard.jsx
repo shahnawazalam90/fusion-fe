@@ -8,8 +8,9 @@ import Card from 'react-bootstrap/Card';
 // import Form from 'react-bootstrap/Form';
 // import InputGroup from 'react-bootstrap/InputGroup';
 
-import { getUserScenarios, executeScenario } from 'src/http';
+import { getUserScenarios, executeScenario, getScenariosJSON } from 'src/http';
 import { notify } from 'src/notify';
+import { downloadFile } from 'src/utils';
 
 import DefaultLayout from 'src/views/layouts/default';
 
@@ -25,8 +26,22 @@ const Dashboard = () => {
     getUserScenarios();
   }, []);
 
+  const scenarioIdMap = useMemo(() => {
+    return Object.fromEntries(userScenarios.map(({ id, name }) => [id, name]))
+  }, [userScenarios]);
+
   const handleScenarioClick = (scenarioId) => {
     setSelectedScenarios(({ ...selectedScenarios, [scenarioId]: !selectedScenarios[scenarioId] }));
+  };
+
+  const handleScenarioDownload = () => {
+    getScenariosJSON(Object.keys(selectedScenarios))
+      .then(async ({ status, data }) => {
+        if (status === 'success') {
+          await downloadFile(data, `${Object.keys(selectedScenarios).map(id => scenarioIdMap[id]).join(', ')}.json`, 4);
+          notify.success('Downloaded successfully!');
+        }
+      });
   };
 
   const handleScenarioExecute = () => {
@@ -38,10 +53,16 @@ const Dashboard = () => {
             <div className='d-flex align-items-center gap-2'>
               <span className='text-nowrap'>Scenarios started executing successfully!</span>
               <Button className='text-nowrap' variant='primary' size='sm' onClick={async () => {
-                console.log('Scenario ID: ', data.scenarioFile.replace(/^.*[\\/]/, ''));
-                await navigator.clipboard.writeText(data.scenarioFile.replace(/^.*[\\/]/, ''));
-                notify.dismiss(t.id)
-                notify.success('Copied successfully!');
+                try {
+                  await navigator.clipboard.writeText(data.scenarioFile.replace(/^.*[\\/]/, ''));
+                  notify.success('Copied successfully!');
+                } catch (err) {
+                  notify.error('Scenario ID could not be copied to clipboard. It has been console logged');
+                  console.log('Clipboard copy error: ', err);
+                  console.log('Scenario ID: ', data.scenarioFile.replace(/^.*[\\/]/, ''));
+                } finally {
+                  notify.dismiss(t.id);
+                }
               }}>
                 Copy Scenario ID
               </Button>
@@ -111,6 +132,9 @@ const Dashboard = () => {
             <div className='dashboard-actions-container d-flex justify-content-end gap-3'>
               <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => setSelectedScenarios({})} disabled={disableScenarioActions}>
                 Clear Selection
+              </Button>
+              <Button className='border-dark-subtle border-1' variant='secondary' onClick={handleScenarioDownload} disabled={disableScenarioActions}>
+                Download
               </Button>
               <Button variant='primary' onClick={handleScenarioExecute} disabled={disableScenarioActions}>
                 Execute
