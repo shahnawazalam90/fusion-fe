@@ -3,6 +3,7 @@ const initialState = {
   user: {},
   posts: [],
   currentScenario: {url: '', screens: []},
+  editScenarioId: null,
   userScenarios: [],
   userReports: [],
   currentReport: {},

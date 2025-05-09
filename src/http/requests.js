@@ -1,4 +1,4 @@
-import { post, get } from './utils';
+import { post, get, del } from './utils';
 import store from 'src/store';
 import { setUser, setUserScenarios, setUserReports, setCurrentScenario } from 'src/store/actions';
 
@@ -51,6 +51,21 @@ export const getUserScenarios = async () => {
   }
 };
 
+export const getScenarioById = async (scenarioId) => {
+  const url = `/api/v1/scenarios/${scenarioId}`;
+
+  try {
+    const response = await get(url);
+    const screens = response?.data?.specFile?.parsedJson?.screens;
+    const screenUrl = response?.data?.specFile?.url;
+    store.dispatch(setCurrentScenario({screens, url: screenUrl}));
+    return {screens, url: screenUrl};
+  } catch (error) {
+    console.error('Get scenario by ID request failed:', error);
+    throw error;
+  }
+};
+
 export const postScenario = async (name, screenUrl, jsonMetaData) => {
   const url = '/api/v1/scenarios/';
   const payload = new URLSearchParams();
@@ -67,6 +82,41 @@ export const postScenario = async (name, screenUrl, jsonMetaData) => {
     return response;
   } catch (error) {
     console.error('Post scenario request failed:', error);
+    throw error;
+  }
+};
+
+export const updateScenario = async (scenarioId, jsonMetaData) => {
+  const url = '/api/v1/scenarios/update';
+  const payload = new URLSearchParams();
+  payload.append('id', scenarioId);
+  payload.append('jsonMetaData', jsonMetaData);
+
+  try {
+    const response = await post(url, payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Update scenario request failed:', error);
+    throw error;
+  }
+};
+
+export const deleteScenario = async (scenarioId) => {
+  const url = `/api/v1/scenarios/${scenarioId}`;
+
+  try {
+    const response = await del(url, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Delete scenario request failed:', error);
     throw error;
   }
 };

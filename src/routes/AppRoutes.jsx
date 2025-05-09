@@ -34,6 +34,12 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/edit"
+          element={
+            <PrivateRoute user={user} children={<CreateScenario />} />
+          }
+        />
+        <Route
           path="/reports"
           element={
             <PrivateRoute user={user} children={<Reports />} />

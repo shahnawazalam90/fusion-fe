@@ -6,10 +6,10 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 
 import store from 'src/store';
-import { notify } from 'src/notify';
 import { setCurrentScenarioValue } from 'src/store/actions';
+import { notify } from 'src/notify';
 
-import { postScenario, getLatestScenario } from "src/http";
+import { postScenario, getScenarioById, getLatestScenario } from "src/http";
 
 import DefaultLayout from 'src/views/layouts/default';
 import ScreenAccordion from './screenAccordion';
@@ -18,18 +18,20 @@ import './createScenario.scss';
 
 const CreateScenario = () => {
   const navigate = useNavigate();
+
   const currentScenario = useSelector((state) => state.currentScenario);
+  const editScenarioId = useSelector((state) => state.editScenarioId);
 
   const [screensChecked, setScreensChecked] = useState([]);
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
 
   useEffect(() => {
-    getLatestScenario().then(({ screens }) => {
+    (editScenarioId ? getScenarioById(editScenarioId) : getLatestScenario()).then(({ screens }) => {
       const updatedChecked = screens.map(() => false);
       setScreensChecked(updatedChecked);
     });
-  }, []);
+  }, [editScenarioId]);
 
   const allActionsSelected = useMemo(() => {
     return screensChecked.find((screenChecked) => !screenChecked) === undefined;

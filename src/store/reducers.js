@@ -1,4 +1,15 @@
-import { SET_USER, SET_POSTS, SET_CURRENT_SCENARIO, SET_CURRENT_SCENARIO_VALUE, SET_USER_SCENARIOS, SET_USER_REPORTS, SET_CURRENT_REPORT } from './actionTypes';
+import {
+  CLEAR_DATA,
+  SET_MENU_VISIBILITY,
+  SET_USER,
+  SET_POSTS,
+  SET_EDIT_SCENARIO_ID,
+  SET_CURRENT_SCENARIO,
+  SET_CURRENT_SCENARIO_VALUE,
+  SET_USER_SCENARIOS,
+  SET_USER_REPORTS,
+  SET_CURRENT_REPORT
+} from './actionTypes';
 import initialState from './initialState';
 
 const rootReducer = (state = initialState, action) => {
@@ -34,6 +45,8 @@ const rootReducer = (state = initialState, action) => {
 
         return { ...state, currentScenario };
       }
+    case SET_EDIT_SCENARIO_ID:
+      return { ...state, editScenarioId: action.payload };
     case SET_USER_SCENARIOS:
       return { ...state, userScenarios: action.payload };
     case SET_USER_REPORTS:

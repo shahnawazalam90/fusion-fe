@@ -1,4 +1,15 @@
-import { CLEAR_DATA, SET_MENU_VISIBILITY, SET_USER, SET_POSTS, SET_CURRENT_SCENARIO, SET_CURRENT_SCENARIO_VALUE, SET_USER_SCENARIOS, SET_USER_REPORTS, SET_CURRENT_REPORT } from './actionTypes';
+import {
+  CLEAR_DATA,
+  SET_MENU_VISIBILITY,
+  SET_USER,
+  SET_POSTS,
+  SET_EDIT_SCENARIO_ID,
+  SET_CURRENT_SCENARIO,
+  SET_CURRENT_SCENARIO_VALUE,
+  SET_USER_SCENARIOS,
+  SET_USER_REPORTS,
+  SET_CURRENT_REPORT
+} from './actionTypes';
 
 export const clearData = () => ({
   type: CLEAR_DATA,
@@ -29,6 +40,11 @@ export const setCurrentScenarioValue = (parentIndex, childIndex, value) => ({
   payload: { parentIndex, childIndex, value },
 });
 
+export const setEditScenarioId = (scenarioId) => ({
+  type: SET_EDIT_SCENARIO_ID,
+  payload: scenarioId,
+});
+
 export const setUserScenarios = (scenarios) => ({
   type: SET_USER_SCENARIOS,
   payload: scenarios,
@@ -39,7 +55,7 @@ export const setUserReports = (reports) => ({
   payload: reports,
 });
 
-export const setCurrentReport = ({scenarioName, reportURL}) => ({
+export const setCurrentReport = ({ scenarioName, reportURL }) => ({
   type: SET_CURRENT_REPORT,
   payload: { scenarioName, reportURL },
 });

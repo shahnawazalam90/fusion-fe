@@ -19,3 +19,23 @@ export const post = async (url, data = {}) => {
     throw error;
   }
 };
+
+export const put = async (url, data = {}) => {
+  try {
+    const response = await http.put(url, data);
+    return response.data;
+  } catch (error) {
+    console.error('POST request failed:', error);
+    throw error;
+  }
+};
+
+export const del = async (url, data = {}) => {
+  try {
+    const response = await http.delete(url, data);
+    return response.data;
+  } catch (error) {
+    console.error('POST request failed:', error);
+    throw error;
+  }
+};

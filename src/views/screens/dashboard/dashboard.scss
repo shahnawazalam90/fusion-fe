@@ -12,17 +12,20 @@ $scenario-card-gutter: 16px;
         gap: $scenario-card-gutter;
 
         .scenario-card {
-          cursor: pointer;
           width: calc((100% - #{$scenario-card-gutter} * 3)/4);
 
-          .scenario-card-title {
-            font-weight: 700;
-            font-size: 16px;
-          }
+          .card-body {
+            cursor: pointer;
 
-          .scenario-card-description {
-            font-weight: 400;
-            font-size: 14px;
+            .scenario-card-title {
+              font-weight: 700;
+              font-size: 16px;
+            }
+  
+            .scenario-card-description {
+              font-weight: 400;
+              font-size: 14px;
+            }
           }
         }
       }
