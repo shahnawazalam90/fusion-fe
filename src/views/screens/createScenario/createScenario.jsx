@@ -9,7 +9,7 @@ import store from 'src/store';
 import { setCurrentScenarioValue } from 'src/store/actions';
 import { notify } from 'src/notify';
 
-import { postScenario, getScenarioById, getLatestScenario } from "src/http";
+import { postScenario, getScenarioById, getLatestScenario, updateScenario } from "src/http";
 
 import DefaultLayout from 'src/views/layouts/default';
 import ScreenAccordion from './screenAccordion';
@@ -20,18 +20,18 @@ const CreateScenario = () => {
   const navigate = useNavigate();
 
   const currentScenario = useSelector((state) => state.currentScenario);
-  const editScenarioId = useSelector((state) => state.editScenarioId);
+  const editScenarioInfo = useSelector((state) => state.editScenarioInfo);
 
   const [screensChecked, setScreensChecked] = useState([]);
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
 
   useEffect(() => {
-    (editScenarioId ? getScenarioById(editScenarioId) : getLatestScenario()).then(({ screens }) => {
+    (editScenarioInfo?.id ? getScenarioById(editScenarioInfo?.id) : getLatestScenario()).then(({ screens }) => {
       const updatedChecked = screens.map(() => false);
       setScreensChecked(updatedChecked);
     });
-  }, [editScenarioId]);
+  }, [editScenarioInfo?.id]);
 
   const allActionsSelected = useMemo(() => {
     return screensChecked.find((screenChecked) => !screenChecked) === undefined;
@@ -84,10 +84,28 @@ const CreateScenario = () => {
       });
   };
 
+  const handleEdit = () => {
+    updateScenario(editScenarioInfo?.id, JSON.stringify(currentScenario?.screens))
+      .then((res) => {
+        if (res.status === 'success') {
+          notify.success('Scenario Update successfully!');
+          navigate('/dashboard');
+        } else {
+          notify.error('Failed to update scenario. Please try again.');
+        }
+      })
+      .catch((error) => {
+        console.error('Error updating scenario:', error);
+        notify.error('Failed to update scenario. Please try again.');
+      });
+  };
+
   return (
     <DefaultLayout>
       <div className='create-scenario-container position-relative d-flex flex-column gap-4'>
-        <p className='create-scenario-heading m-0'>Create New Scenario</p>
+        <p className='create-scenario-heading m-0'>
+          {!editScenarioInfo?.id ? 'Create New Scenario' : 'Edit Scenario'}
+        </p>
 
         {currentScenario?.screens?.length === 0 ? (
           <div className='no-scenario-container flex-grow-1 d-flex align-items-center justify-content-center'>
@@ -97,7 +115,7 @@ const CreateScenario = () => {
           <>
             <div className='scenario-list-container d-flex flex-column gap-1'>
               <div className="d-flex align-items-center mb-3">
-                {!editEnabled ? (
+                {(!editScenarioInfo?.id && !editEnabled) ? (
                   <>
                     <label className="form-label-checkbox mb-0 me-2" htmlFor='select-all-checkbox'>Select All</label>
                     <input id='select-all-checkbox' type="checkbox" className="form-check-input mt-0 border-dark-subtle rounded-1" checked={allActionsSelected} onChange={() => checkAllActions()} />
@@ -109,7 +127,8 @@ const CreateScenario = () => {
                       name='ScenarioName'
                       type='text'
                       placeholder='Scenario Name'
-                      value={scenarioName}
+                      value={editScenarioInfo?.id ? editScenarioInfo?.name : scenarioName}
+                      disabled={editScenarioInfo?.id}
                       onChange={(e) => setScenarioName(e.target.value)}
                     />
                   </Form.Group>
@@ -127,7 +146,7 @@ const CreateScenario = () => {
                     screenNameID={screenNameID}
                     screenSelected={screensChecked[i] || false}
                     toggleScreenSelection={() => checkScreen(i)}
-                    editEnabled={editEnabled}
+                    editEnabled={editEnabled || editScenarioInfo?.id}
                     onChange={(j, value) => handleChange(i, j, value)}
                   />
                 )
@@ -135,7 +154,7 @@ const CreateScenario = () => {
             </div>
 
             <div className='scenario-actions-container d-flex gap-3 justify-content-end'>
-              {!editEnabled ? (
+              {(!editScenarioInfo?.id && !editEnabled) ? (
                 <>
                   <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => navigate('/dashboard')}>
                     Cancel
@@ -146,10 +165,10 @@ const CreateScenario = () => {
                 </>
               ) : (
                 <>
-                  <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => setEditEnabled(false)}>
+                  <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => editScenarioInfo?.id ? navigate('/dashboard') : setEditEnabled(false)}>
                     Back
                   </Button>
-                  <Button variant='primary' onClick={handleSave}>
+                  <Button variant='primary' onClick={!editScenarioInfo?.id ? handleSave : handleEdit}>
                     Save
                   </Button>
                 </>

@@ -3,7 +3,7 @@ import {
   SET_MENU_VISIBILITY,
   SET_USER,
   SET_POSTS,
-  SET_EDIT_SCENARIO_ID,
+  SET_EDIT_SCENARIO_INFO,
   SET_CURRENT_SCENARIO,
   SET_CURRENT_SCENARIO_VALUE,
   SET_USER_SCENARIOS,
@@ -14,9 +14,9 @@ import initialState from './initialState';
 
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'CLEAR_DATA':
+    case CLEAR_DATA:
       return initialState;
-    case 'SET_MENU_VISIBILITY':
+    case SET_MENU_VISIBILITY:
       return { ...state, menu_visibility: action.payload };
     case SET_USER:
       return { ...state, user: action.payload };
@@ -45,8 +45,8 @@ const rootReducer = (state = initialState, action) => {
 
         return { ...state, currentScenario };
       }
-    case SET_EDIT_SCENARIO_ID:
-      return { ...state, editScenarioId: action.payload };
+    case SET_EDIT_SCENARIO_INFO:
+      return { ...state, editScenarioInfo: action.payload };
     case SET_USER_SCENARIOS:
       return { ...state, userScenarios: action.payload };
     case SET_USER_REPORTS:

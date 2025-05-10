@@ -6,6 +6,7 @@ export {
   getReports,
   getLatestScenario,
   postScenario,
+  updateScenario,
   deleteScenario,
   executeScenario,
   getScenariosJSON,

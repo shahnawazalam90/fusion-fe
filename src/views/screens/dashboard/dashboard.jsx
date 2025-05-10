@@ -13,7 +13,7 @@ import { getUserScenarios, deleteScenario, executeScenario, getScenariosJSON } f
 import { notify } from 'src/notify';
 import { downloadFile } from 'src/utils';
 import store from 'src/store';
-import { setCurrentScenario, setEditScenarioId } from 'src/store/actions';
+import { setCurrentScenario, setEditScenarioInfo } from 'src/store/actions';
 import initialState from 'src/store/initialState';
 
 import DefaultLayout from 'src/views/layouts/default';
@@ -51,9 +51,9 @@ const Dashboard = () => {
       });
   };
 
-  const handleEditScenario = (scenarioId) => {
+  const handleEditScenario = (id, name) => {
     store.dispatch(setCurrentScenario(initialState.currentScenario));
-    store.dispatch(setEditScenarioId(scenarioId));
+    store.dispatch(setEditScenarioInfo({ id, name }));
     navigate('/edit');
   };
 
@@ -109,7 +109,7 @@ const Dashboard = () => {
           <div className='user-scenario-container flex-grow-1 d-flex flex-column gap-3'>
             <div className='scenario-controls-container d-flex align-items-center justify-content-end'>
               <Button variant='primary' onClick={() => {
-                store.dispatch(setEditScenarioId());
+                store.dispatch(setEditScenarioInfo(initialState.editScenarioInfo));
                 navigate('/create');
               }}>
                 <i className='create-new-icon bi bi-plus-circle me-2' />
@@ -161,7 +161,7 @@ const Dashboard = () => {
                       </Button>
                       <Button
                         variant='primary'
-                        onClick={() => handleEditScenario(scenario.id)}
+                        onClick={() => handleEditScenario(scenario.id, scenario.name)}
                       >
                         <i className="me-1 bi bi-pencil-square" />
                         Edit

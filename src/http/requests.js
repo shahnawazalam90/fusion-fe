@@ -1,4 +1,4 @@
-import { post, get, del } from './utils';
+import { post, put, get, del } from './utils';
 import store from 'src/store';
 import { setUser, setUserScenarios, setUserReports, setCurrentScenario } from 'src/store/actions';
 
@@ -56,10 +56,9 @@ export const getScenarioById = async (scenarioId) => {
 
   try {
     const response = await get(url);
-    const screens = response?.data?.specFile?.parsedJson?.screens;
-    const screenUrl = response?.data?.specFile?.url;
-    store.dispatch(setCurrentScenario({screens, url: screenUrl}));
-    return {screens, url: screenUrl};
+    const screens = JSON.parse(response?.data?.jsonMetaData);
+    store.dispatch(setCurrentScenario({screens, url: ''}));
+    return {screens, url: ''};
   } catch (error) {
     console.error('Get scenario by ID request failed:', error);
     throw error;
@@ -93,7 +92,7 @@ export const updateScenario = async (scenarioId, jsonMetaData) => {
   payload.append('jsonMetaData', jsonMetaData);
 
   try {
-    const response = await post(url, payload, {
+    const response = await put(url, payload, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },

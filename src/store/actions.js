@@ -3,7 +3,7 @@ import {
   SET_MENU_VISIBILITY,
   SET_USER,
   SET_POSTS,
-  SET_EDIT_SCENARIO_ID,
+  SET_EDIT_SCENARIO_INFO,
   SET_CURRENT_SCENARIO,
   SET_CURRENT_SCENARIO_VALUE,
   SET_USER_SCENARIOS,
@@ -40,9 +40,9 @@ export const setCurrentScenarioValue = (parentIndex, childIndex, value) => ({
   payload: { parentIndex, childIndex, value },
 });
 
-export const setEditScenarioId = (scenarioId) => ({
-  type: SET_EDIT_SCENARIO_ID,
-  payload: scenarioId,
+export const setEditScenarioInfo = ({id, name}) => ({
+  type: SET_EDIT_SCENARIO_INFO,
+  payload: { id, name },
 });
 
 export const setUserScenarios = (scenarios) => ({
