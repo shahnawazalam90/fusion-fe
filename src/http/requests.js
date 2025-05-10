@@ -125,7 +125,7 @@ export const getReports = async () => {
 
   try {
     const response = await get(url);
-    store.dispatch(setUserReports(response.data.reports));
+    store.dispatch(setUserReports(response.data));
     return response;
   } catch (error) {
     console.error('Get reports request failed:', error);
