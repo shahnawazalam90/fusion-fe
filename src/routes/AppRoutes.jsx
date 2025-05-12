@@ -7,7 +7,7 @@ import Dashboard from 'src/views/screens/dashboard';
 import Upload from 'src/views/screens/upload';
 import CreateScenario from 'src/views/screens/createScenario';
 import Reports from 'src/views/screens/reports';
-
+import ReportView from 'src/views/screens/video/report-view';
 function AppRoutes() {
   const user = useSelector((state) => state.user);
 
@@ -43,6 +43,12 @@ function AppRoutes() {
           path="/reports"
           element={
             <PrivateRoute user={user} children={<Reports />} />
+          }
+        />
+        <Route
+          path="/report-view/:reportId"
+          element={
+            <PrivateRoute user={user} children={<ReportView />} />
           }
         />
         <Route path="/*" element={<Navigate to={user?.token ? "/dashboard" : "/login"} />} />
