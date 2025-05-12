@@ -12,7 +12,7 @@
       .accordion-checkbox {
         width: 24px;
         height: 24px;
-  
+
         &:checked {
           background-color: #17567C;
         }
@@ -32,6 +32,12 @@
                 td {
                   border: none;
                 }
+              }
+
+              td.table-content {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
               }
 
               input:disabled {

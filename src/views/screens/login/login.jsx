@@ -80,7 +80,7 @@ const Login = () => {
                   <InputGroup.Text className='password-icon-container'>
                     <i
                       className={classNames(
-                        'password-visibility-icon bi text-secondary',
+                        'password-visibility-icon bi text-primary',
                         {
                           'bi-eye-slash-fill': showPassword,
                           'bi-eye-fill': !showPassword

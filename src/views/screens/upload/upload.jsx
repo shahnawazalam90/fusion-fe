@@ -82,7 +82,7 @@ const Upload = () => {
               }}
               onDragOver={(e) => e.preventDefault()}
             >
-              <i className="upload-file-icon bi bi-file-earmark-arrow-up text-secondary"></i>
+              <i className="upload-file-icon bi bi-file-earmark-arrow-up text-primary"></i>
               <h3 className="upload-file-text m-0">Drag and drop TS file here</h3>
               <p className="upload-file-text m-0">OR</p>
               <label htmlFor="tsFileUpload" className="btn btn-primary">
@@ -97,8 +97,8 @@ const Upload = () => {
             </div>
 
             <div className="d-flex justify-content-between">
-              <p className="upload-file-text text-secondary m-0">Supported Formats: TS</p>
-              <p className="upload-file-text text-secondary m-0">Maximum file size: 80MB</p>
+              <p className="upload-file-text m-0">Supported Formats: TS</p>
+              <p className="upload-file-text m-0">Maximum file size: 80MB</p>
             </div>
           </div>
         ) : (
