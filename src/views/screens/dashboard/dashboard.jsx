@@ -236,7 +236,7 @@ const Dashboard = () => {
                   eventSource.close();
                 }
   
-                eventSource = new EventSource('http://localhost:3000/api/v1/reports/' + reportId + '/stream');
+                eventSource = new EventSource(import.meta.env.VITE_API_URL + '/api/v1/reports/' + reportId + '/stream');
   
                 eventSource.onopen = () => {
                   updateStatus('connecting');

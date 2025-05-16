@@ -56,9 +56,14 @@ export const getScenarioById = async (scenarioId) => {
 
   try {
     const response = await get(url);
-    const screens = JSON.parse(response?.data?.jsonMetaData);
-    store.dispatch(setCurrentScenario({screens, url: ''}));
-    return {screens, url: ''};
+
+    const scenario = {
+      screens: JSON.parse(response?.data?.jsonMetaData),
+      url: response?.data?.url
+    };
+
+    store.dispatch(setCurrentScenario(scenario));
+    return scenario;
   } catch (error) {
     console.error('Get scenario by ID request failed:', error);
     throw error;

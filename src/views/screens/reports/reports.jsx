@@ -4,6 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import { useSelector } from 'react-redux';
 
 import { notify } from 'src/notify';
+
 import { toTitleCase } from 'src/utils';
 import { getReports } from 'src/http/requests';
 
@@ -25,7 +26,7 @@ const Report = () => {
   useEffect(() => {
     if (reportURL) {
       var iframe = document.getElementById('reportiframe');
-      iframe.src = 'http://localhost:3000' + reportURL;
+      iframe.src = (import.meta.env.VITE_API_URL || '') + reportURL;
     }
   }, [reportURL]);
 
