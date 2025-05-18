@@ -145,8 +145,8 @@ export const getLatestScenario = async () => {
     const response = await get(url);
     const screens = response?.data?.specFile?.parsedJson?.screens;
     const screenUrl = response?.data?.specFile?.url;
-    store.dispatch(setCurrentScenario({screens, url: screenUrl}));
-    return {screens, url: screenUrl};
+    store.dispatch(setCurrentScenario({ screens, url: screenUrl }));
+    return { screens, url: screenUrl };
   } catch (error) {
     console.error('Get latest scenario request failed:', error);
     throw error;
@@ -185,6 +185,26 @@ export const getScenariosJSON = async (scenarioIds) => {
     return response;
   } catch (error) {
     console.error('Get scenarios JSON request failed:', error);
+    throw error;
+  }
+};
+
+export const scheduleScenario = async (scheduleTime, scenarioIds) => {
+  const url = '/api/v1/schedules';
+  const payload = new URLSearchParams();
+  payload.append('name', '');
+  payload.append('scheduleTime', scheduleTime);
+  payload.append('scenarioIds', JSON.stringify(scenarioIds));
+
+  try {
+    const response = await post(url, payload, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('Schedule scenario request failed:', error);
     throw error;
   }
 };

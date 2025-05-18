@@ -10,4 +10,5 @@ export {
   deleteScenario,
   executeScenario,
   getScenariosJSON,
+  scheduleScenario,
 } from './requests';

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
+import dayjs from 'dayjs'
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -14,6 +15,7 @@ import {
   deleteScenario,
   executeScenario,
   getScenariosJSON,
+  scheduleScenario
 } from 'src/http';
 import { notify } from 'src/notify';
 import { downloadFile } from 'src/utils';
@@ -31,6 +33,8 @@ const Dashboard = () => {
 
   const [selectedScenarios, setSelectedScenarios] = useState({});
   const [deletionScenario, setDeletionScenario] = useState();
+  const [scheduleDT, setScheduleDT] = useState();
+  const [scheduleError, setScheduleError] = useState('');
 
   useEffect(() => {
     getUserScenarios();
@@ -136,6 +140,28 @@ const Dashboard = () => {
     });
   };
 
+  const handleScheduleScenario = () => {
+    if (scheduleDT && scheduleDT < new Date()) {
+      setScheduleError('Please select a future date and time.');
+      return;
+    }
+
+    setScheduleError('');
+    setScheduleDT(null);
+    setSelectedScenarios({});
+
+    scheduleScenario(scheduleDT.toUTCString(), Object.keys(selectedScenarios))
+      .then(({ success }) => {
+        if (success) {
+          notify.success('Scenario scheduled successfully!');
+        }
+      }).catch(() => {
+        notify.error(
+          'Something went wrong while trying to schedule the scenario.'
+        );
+      });
+  };
+
   const disableScenarioActions = useMemo(
     () => !Object.values(selectedScenarios).find((x) => x),
     [selectedScenarios]
@@ -144,7 +170,7 @@ const Dashboard = () => {
   const openTestStreamWindow = (reportId) => {
     // Create and open the popup window
     const streamWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
     // Create the HTML content with embedded JavaScript
     const html = `
       <!DOCTYPE html>
@@ -297,7 +323,7 @@ const Dashboard = () => {
         </body>
       </html>
     `;
-  
+
     // Write the HTML to the new window
     streamWindow.document.write(html);
     streamWindow.document.close();
@@ -389,7 +415,7 @@ const Dashboard = () => {
                 ))}
               </div>
             </div>
-            <div className="dashboard-actions-container d-flex justify-content-end gap-3">
+            <div className="dashboard-actions-container d-flex align-items-center justify-content-end gap-3">
               <Button
                 className="border-dark-subtle border-1"
                 variant="secondary"
@@ -406,13 +432,22 @@ const Dashboard = () => {
               >
                 Download
               </Button>
-              <Button
-                variant="primary"
-                onClick={handleScenarioExecute}
-                disabled={disableScenarioActions}
-              >
-                Execute
-              </Button>
+              <div className='d-flex gap-1 p-1 border border-1 border-black rounded-3'>
+                <Button
+                  variant="primary"
+                  onClick={handleScenarioExecute}
+                  disabled={disableScenarioActions}
+                >
+                  Execute
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => setScheduleDT(new Date())}
+                  disabled={disableScenarioActions}
+                >
+                  <i className="bi bi-alarm" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -420,6 +455,7 @@ const Dashboard = () => {
         {/* Filter UI - To Be Implemented */}
         {/* <div className='scenario-filter-container position-fixed d-flex flex-column'></div> */}
 
+        {/* Delete Scenario Modal */}
         <Modal
           size="md"
           centered
@@ -448,6 +484,60 @@ const Dashboard = () => {
             >
               <i className="me-1 bi bi-check-lg" />
               Yes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Schedule Scenario Modal */}
+        <Modal
+          size="md"
+          centered
+          show={!!scheduleDT}
+          onHide={() => { setScheduleDT(null); setScheduleError(''); }}
+        >
+          <Modal.Header className="border-0 pb-0" closeButton>
+            <Modal.Title>Schedule Scenario Execution</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className='d-flex flex-column gap-3'>
+              <p className='m-0'>The scenario will be executed at {scheduleDT?.toLocaleString()}</p>
+              <div className='d-flex gap-2'>
+                <input
+                  className="form-control"
+                  type='date'
+                  value={dayjs(scheduleDT)?.format('YYYY-MM-DD')}
+                  onChange={(e) => setScheduleDT(new Date(scheduleDT.setFullYear(e.target.value.split('-')[0], e.target.value.split('-')[1] - 1, e.target.value.split('-')[2])))}
+                />
+                <input
+                  className="form-control"
+                  type='time'
+                  value={dayjs(scheduleDT)?.format('HH:mm:ss')}
+                  onChange={(e) => setScheduleDT(new Date(scheduleDT.setHours(e.target.value.split(':')[0], e.target.value.split(':')[1], e.target.value.split(':')[2])))}
+                />
+              </div>
+              {scheduleError && (
+                <p className="text-danger m-0">
+                  {scheduleError}
+                </p>
+              )}
+            </div>
+          </Modal.Body>
+          <Modal.Footer className="d-flex gap-2 justify-content-end border-0 pt-0">
+            <Button
+              className="border-dark-subtle border-1"
+              variant="secondary"
+              onClick={() => { setScheduleDT(null); setScheduleError(''); }}
+            >
+              <i className="me-1 bi bi-x-lg" />
+              Cancel
+            </Button>
+            <Button
+              className="border-dark-subtle border-1"
+              variant="success"
+              onClick={handleScheduleScenario}
+            >
+              <i className="me-1 bi bi-check-lg" />
+              Schedule
             </Button>
           </Modal.Footer>
         </Modal>
