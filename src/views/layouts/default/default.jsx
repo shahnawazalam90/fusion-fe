@@ -22,6 +22,10 @@ const menuItems = [
     iconClass: 'bi bi-file-earmark-bar-graph-fill',
     title: 'Reports',
     path: '/reports',
+  }, {
+    iconClass: 'bi bi-alarm',
+    title: 'Schedules',
+    path: '/schedules',
   }
 ];
 

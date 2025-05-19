@@ -7,6 +7,7 @@ const initialState = {
   userScenarios: [],
   userReports: [],
   currentReport: {},
+  schedules: [],
 };
 
 export default initialState;

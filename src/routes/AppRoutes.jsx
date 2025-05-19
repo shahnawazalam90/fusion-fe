@@ -7,6 +7,7 @@ import Dashboard from 'src/views/screens/dashboard';
 import Upload from 'src/views/screens/upload';
 import CreateScenario from 'src/views/screens/createScenario';
 import Reports from 'src/views/screens/reports';
+import Schedules from 'src/views/screens/schedules';
 import ReportView from 'src/views/screens/video/report-view';
 function AppRoutes() {
   const user = useSelector((state) => state.user);
@@ -43,6 +44,12 @@ function AppRoutes() {
           path="/reports"
           element={
             <PrivateRoute user={user} children={<Reports />} />
+          }
+        />
+        <Route
+          path="/schedules"
+          element={
+            <PrivateRoute user={user} children={<Schedules />} />
           }
         />
         <Route

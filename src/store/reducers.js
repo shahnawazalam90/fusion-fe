@@ -8,7 +8,8 @@ import {
   SET_CURRENT_SCENARIO_VALUE,
   SET_USER_SCENARIOS,
   SET_USER_REPORTS,
-  SET_CURRENT_REPORT
+  SET_CURRENT_REPORT,
+  SET_SCHEDULES
 } from './actionTypes';
 import initialState from './initialState';
 
@@ -58,6 +59,11 @@ const rootReducer = (state = initialState, action) => {
           scenarioName: action.payload.scenarioName,
           reportURL: action.payload.reportURL
         }
+      };
+    case SET_SCHEDULES:
+      return {
+        ...state,
+        schedules: action.payload,
       };
     default:
       return state;

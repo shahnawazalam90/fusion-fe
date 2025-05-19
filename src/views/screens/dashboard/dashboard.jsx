@@ -6,6 +6,7 @@ import dayjs from 'dayjs'
 
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 // import Form from 'react-bootstrap/Form';
 // import InputGroup from 'react-bootstrap/InputGroup';
@@ -33,6 +34,7 @@ const Dashboard = () => {
 
   const [selectedScenarios, setSelectedScenarios] = useState({});
   const [deletionScenario, setDeletionScenario] = useState();
+  const [scheduleName, setScheduleName] = useState('');
   const [scheduleDT, setScheduleDT] = useState();
   const [scheduleError, setScheduleError] = useState('');
 
@@ -140,17 +142,32 @@ const Dashboard = () => {
     });
   };
 
+  const closeScheduleModal = () => {
+    setScheduleName('');
+    setScheduleDT(null);
+    setScheduleError('');
+  };
+
   const handleScheduleScenario = () => {
+    if (!scheduleDT) {
+      setScheduleError('Please select a date and time.');
+      return;
+    }
+
     if (scheduleDT && scheduleDT < new Date()) {
       setScheduleError('Please select a future date and time.');
       return;
     }
 
-    setScheduleError('');
-    setScheduleDT(null);
+    if (!scheduleName) {
+      setScheduleError('Please enter a name for the schedule.');
+      return;
+    }
+
+    closeScheduleModal();
     setSelectedScenarios({});
 
-    scheduleScenario(scheduleDT.toUTCString(), Object.keys(selectedScenarios))
+    scheduleScenario(scheduleName, scheduleDT.toUTCString(), Object.keys(selectedScenarios))
       .then(({ success }) => {
         if (success) {
           notify.success('Scenario scheduled successfully!');
@@ -493,7 +510,7 @@ const Dashboard = () => {
           size="md"
           centered
           show={!!scheduleDT}
-          onHide={() => { setScheduleDT(null); setScheduleError(''); }}
+          onHide={closeScheduleModal}
         >
           <Modal.Header className="border-0 pb-0" closeButton>
             <Modal.Title>Schedule Scenario Execution</Modal.Title>
@@ -501,20 +518,33 @@ const Dashboard = () => {
           <Modal.Body>
             <div className='d-flex flex-column gap-3'>
               <p className='m-0'>The scenario will be executed at {scheduleDT?.toLocaleString()}</p>
-              <div className='d-flex gap-2'>
-                <input
-                  className="form-control"
-                  type='date'
-                  value={dayjs(scheduleDT)?.format('YYYY-MM-DD')}
-                  onChange={(e) => setScheduleDT(new Date(scheduleDT.setFullYear(e.target.value.split('-')[0], e.target.value.split('-')[1] - 1, e.target.value.split('-')[2])))}
+              <Form.Group className='w-100'>
+                <Form.Label>Schedule Name<span className='text-danger'>*</span></Form.Label>
+                <Form.Control
+                  name='Schedule Name'
+                  type='text'
+                  placeholder='Schedule Name'
+                  value={scheduleName}
+                  onChange={(e) => setScheduleName(e.target.value)}
                 />
-                <input
-                  className="form-control"
-                  type='time'
-                  value={dayjs(scheduleDT)?.format('HH:mm:ss')}
-                  onChange={(e) => setScheduleDT(new Date(scheduleDT.setHours(e.target.value.split(':')[0], e.target.value.split(':')[1], e.target.value.split(':')[2])))}
-                />
-              </div>
+              </Form.Group>
+              <Form.Group className='w-100'>
+                <Form.Label>Schedule Time<span className='text-danger'>*</span></Form.Label>
+                <div className='d-flex gap-2'>
+                  <input
+                    className="form-control"
+                    type='date'
+                    value={dayjs(scheduleDT)?.format('YYYY-MM-DD')}
+                    onChange={(e) => setScheduleDT(new Date(scheduleDT.setFullYear(e.target.value.split('-')[0], e.target.value.split('-')[1] - 1, e.target.value.split('-')[2])))}
+                  />
+                  <input
+                    className="form-control"
+                    type='time'
+                    value={dayjs(scheduleDT)?.format('HH:mm:ss')}
+                    onChange={(e) => setScheduleDT(new Date(scheduleDT.setHours(e.target.value.split(':')[0], e.target.value.split(':')[1], e.target.value.split(':')[2])))}
+                  />
+                </div>
+              </Form.Group>
               {scheduleError && (
                 <p className="text-danger m-0">
                   {scheduleError}
@@ -526,7 +556,7 @@ const Dashboard = () => {
             <Button
               className="border-dark-subtle border-1"
               variant="secondary"
-              onClick={() => { setScheduleDT(null); setScheduleError(''); }}
+              onClick={closeScheduleModal}
             >
               <i className="me-1 bi bi-x-lg" />
               Cancel
