@@ -1,62 +1,84 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { Button, Checkbox, Collapse, Empty, Input, Table, Typography } from 'antd';
+import { ArrowLeftOutlined, CloseOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router";
 import { useSelector } from 'react-redux';
 
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
-
-import store from 'src/store';
-import { setCurrentScenarioValue } from 'src/store/actions';
+import { getLatestScenario, postScenario } from "src/http";
+import { toTitleCase, writeArrayToExcel, readExcelToArray, scenarioScreensToRefArray, checkExcelValidity } from "src/utils";
 import { notify } from 'src/notify';
 
-import { postScenario, getScenarioById, getLatestScenario, updateScenario } from "src/http";
-
 import DefaultLayout from 'src/views/layouts/default';
-import ScreenAccordion from './screenAccordion';
 
 import './createScenario.scss';
-import * as XLSX from 'xlsx';
+
+const { Text, Title } = Typography;
 
 const CreateScenario = () => {
   const navigate = useNavigate();
-
   const currentScenario = useSelector((state) => state.currentScenario);
-  const editScenarioInfo = useSelector((state) => state.editScenarioInfo);
 
   const [screensChecked, setScreensChecked] = useState([]);
+  const [screenValues, setScreenValues] = useState({});
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
   const [scenarioURL, setScenarioURL] = useState('');
-  const [fillErrors, setFillErrors] = useState([]);
 
-  useEffect(() => {
-    (editScenarioInfo?.id ? getScenarioById(editScenarioInfo?.id) : getLatestScenario()).then((scenario) => {
-      const updatedChecked = scenario.screens.map(() => !!editScenarioInfo?.id);
-      setScreensChecked(updatedChecked);
-      setScenarioName(editScenarioInfo?.name || '');
-      setScenarioURL(scenario.url);
-    });
-  }, [editScenarioInfo]);
+  const filteredScreens = useMemo(() => {
+    return currentScenario?.screens?.filter((screen, i) => !editEnabled || screensChecked[i]);
+  }, [currentScenario, editEnabled, screensChecked]);
 
-  const allActionsSelected = useMemo(() => {
-    return screensChecked.find((screenChecked) => !screenChecked) === undefined;
+  const allScreensSelected = useMemo(() => {
+    if (screensChecked.length === 0) return false;
+
+    return screensChecked.find((checked) => !checked) === undefined;
   }, [screensChecked]);
 
-  const checkAllActions = () => {
-    const updatedChecked = screensChecked.map(() => !allActionsSelected);
-    setScreensChecked(updatedChecked);
+  useEffect(() => {
+    getLatestScenario().then((scenario) => {
+      const screensCheckedNew = [];
+      scenario.screens.forEach((_, i) => {
+        screensCheckedNew[i] = false;
+      });
+      setScreensChecked(screensCheckedNew);
+      setScenarioURL(scenario.url);
+    });
+  }, []);
+
+  useEffect(() => {
+    const screenValuesNew = {};
+    filteredScreens.forEach(({ actions }, i) => {
+      actions.forEach((_, j) => {
+        screenValuesNew[`${i},${j}`] = '';
+      });
+    });
+    setScreenValues(screenValuesNew);
+  }, [filteredScreens]);
+
+  const checkAllScreens = () => {
+    const updatedScreensChecked = screensChecked.map(() => (!allScreensSelected));
+    setScreensChecked(updatedScreensChecked);
   };
 
   const checkScreen = (i) => {
-    const updatedChecked = [...screensChecked];
+    const updatedScreensChecked = [...screensChecked];
 
-    updatedChecked[i] = !updatedChecked[i];
+    updatedScreensChecked[i] = !updatedScreensChecked[i];
 
-    setScreensChecked(updatedChecked);
+    setScreensChecked(updatedScreensChecked);
   };
 
-  const handleFileUpload = (e) => {
+  const handleNext = () => {
+    if (!screensChecked.find((checked) => checked)) {
+      notify.error('At least one screen is required.');
+      return;
+    }
+
+    window.scrollTo(0, 0);
+    setEditEnabled(true);
+  };
+
+  const handleExcelUpload = (e) => {
     const file = e.target.files[0];
     if (!file) {
       notify.error('No file selected.');
@@ -71,76 +93,33 @@ const CreateScenario = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    readExcelToArray(file, (excelData) => {
+      e.target.value = null; // Clear the input value
+      const scenarioRefArray = scenarioScreensToRefArray(filteredScreens);
+      let canProcess = checkExcelValidity(excelData, scenarioRefArray);
 
-        const missingRows = [];
+      if (canProcess) {
+        const newScreenValues = {};
 
-        jsonData.forEach(row => {
-          const sName = row['Screen Name'].replaceAll(" ", "").toLowerCase();
-          const fName = row['Field Name'].replaceAll(" ", "").toLowerCase();
+        excelData.forEach((row, i) => {
+          if (i === 0) return; // Skip header row
 
-          const screenMatchIndex = currentScenario?.screens?.findIndex(({ screenName }) => screenName.replaceAll(" ", "").toLowerCase() === sName);
-
-          if (screenMatchIndex !== -1) {
-            const fieldMatchIndex = currentScenario?.screens?.[screenMatchIndex].actions.findIndex(({ options, selector, action }) => ['fill', 'selectOption'].includes(action) && ((options?.name || selector).replaceAll(" ", "").toLowerCase() === fName));
-
-            if (fieldMatchIndex !== -1) {
-              store.dispatch(setCurrentScenarioValue(screenMatchIndex, fieldMatchIndex, row['Value']));
-
-              return;
-            }
-          }
-
-          missingRows.push(row);
+          newScreenValues[row[0]] = row[3];
         });
 
-        if (missingRows.length) {
-          setFillErrors(missingRows);
-        } else {
-          notify.success('All values were filled from the uploaded file. Please verify before proceeding!');
-        }
-      } catch (error) {
-        console.error('Error reading Excel file:', error);
-        notify.error('Failed to read the Excel file. Please try again.');
-      } finally {
-        document.getElementById('xlsFileUpload').value = "";
+        setScreenValues(newScreenValues);
+        notify.success('File uploaded and values added successfully!');
       }
-    };
-
-    reader.readAsArrayBuffer(file);
+    });
   };
 
-  const handleChange = (parentIndex, childIndex, value) => {
-    store.dispatch(setCurrentScenarioValue(parentIndex, childIndex, value));
-  };
-
-  const handleNext = () => {
-    if (!screensChecked.find((screenChecked) => screenChecked)) {
-      notify.error('At least one screen is required.');
-      return;
-    }
-    window.scrollTo(0, 0);
-    setEditEnabled(true);
-  };
-
-  const handleSave = () => {
+  const handleSubmit = () => {
     if (!scenarioName) {
       notify.error('Scenario name is required.');
       return;
     }
-    if (!scenarioURL && editScenarioInfo?.id) {
-      notify.error('Scenario URL is required.');
-      return;
-    }
 
-    postScenario(scenarioName, scenarioURL, JSON.stringify(currentScenario?.screens.filter((_, i) => screensChecked[i])))
+    postScenario(scenarioName, scenarioURL, JSON.stringify(filteredScreens), JSON.stringify(Object.keys(screenValues).map((key) => [key, screenValues[key]])))
       .then((res) => {
         if (res.status === 'success') {
           notify.success('Scenario created successfully!');
@@ -155,152 +134,187 @@ const CreateScenario = () => {
       });
   };
 
-  const handleEdit = () => {
-    updateScenario(editScenarioInfo?.id, JSON.stringify(currentScenario?.screens))
-      .then((res) => {
-        if (res.status === 'success') {
-          notify.success('Scenario Update successfully!');
-          navigate('/dashboard');
-        } else {
-          notify.error('Failed to update scenario. Please try again.');
-        }
-      })
-      .catch((error) => {
-        console.error('Error updating scenario:', error);
-        notify.error('Failed to update scenario. Please try again.');
-      });
-  };
-
   return (
     <DefaultLayout>
-      <>
-        <div className='create-scenario-container position-relative d-flex flex-column gap-4'>
-          <p className='create-scenario-heading m-0'>
-            {!editScenarioInfo?.id ? 'Create New Scenario' : 'Edit Scenario'}
-          </p>
+      <div className='create-scenario-container position-relative d-flex flex-column gap-4'>
+        <Title className='create-scenario-heading m-0'>
+          Create New Scenario
+        </Title>
 
-          {currentScenario?.screens?.length === 0 ? (
-            <div className='no-scenario-container flex-grow-1 d-flex align-items-center justify-content-center'>
-              <p className='no-scenario-text'>No Scenario available. Please upload a spec file & then continue</p>
-            </div>
-          ) : (
-            <>
-              <div className='scenario-list-container d-flex flex-column gap-1'>
-                <div className="d-flex align-items-center mb-3">
-                  {(!editScenarioInfo?.id && !editEnabled) ? (
-                    <>
-                      <label className="form-label-checkbox mb-0 me-2" htmlFor='select-all-checkbox'>Select All</label>
-                      <input id='select-all-checkbox' type="checkbox" className="form-check-input mt-0 border-dark-subtle rounded-1" checked={allActionsSelected} onChange={() => checkAllActions()} />
-                    </>
-                  ) : (
-                    <div className='d-flex gap-3 w-100'>
-                      <Form.Group className='w-50'>
-                        <Form.Label>Scenario Name <span className='text-danger'>*</span></Form.Label>
-                        <Form.Control
-                          name='ScenarioName'
-                          type='text'
-                          placeholder='Scenario Name'
-                          value={scenarioName}
-                          onChange={(e) => setScenarioName(e.target.value)}
-                        />
-                      </Form.Group>
-                      {editScenarioInfo?.id &&
-                        <Form.Group className='w-50'>
-                          <Form.Label>Scenario URL <span className='text-danger'>*</span></Form.Label>
-                          <Form.Control
-                            name='ScenarioURL'
-                            type='text'
-                            placeholder='Scenario URL'
-                            value={scenarioURL}
-                            onChange={(e) => setScenarioURL(e.target.value)}
-                          />
-                        </Form.Group>
-                      }
-                      <div className='d-flex align-items-end'>
-                        <label htmlFor="xlsFileUpload" className="btn btn-primary text-nowrap">
-                          <h5 className="d-inline bi bi-filetype-xls me-1" />
-                          Fill values with excel
-                        </label>
+        {(currentScenario?.screens?.length === 0) &&
+          <Empty
+            className='py-5 my-5'
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <Text>No Data available. Please upload a spec file & then continue</Text>
+            }
+          >
+            <Button type='primary' onClick={() => navigate('/upload')}>Upload</Button>
+          </Empty>
+        }
+
+        {(currentScenario?.screens?.length !== 0) &&
+          <>
+            <div className='d-flex flex-column gap-3'>
+              <div className="d-flex align-items-center">
+                {(!editEnabled) && (
+                  <label className='d-flex align-items-center gap-1 cursor-pointer'>
+                    <Text>Select All</Text>
+                    <Checkbox checked={allScreensSelected} onChange={() => checkAllScreens()} />
+                  </label>
+                )}
+                {(editEnabled) && (
+                  <div className='d-flex gap-3 w-100'>
+                    <div className='d-flex flex-column gap-1 flex-grow-1'>
+                      <Title level={5}>Scenario Name <Text type='danger'>*</Text></Title>
+                      <Input
+                        name='Scenario Name'
+                        placeholder='Enter Scenario Name'
+                        onChange={e => setScenarioName(e.target.value)}
+                        value={scenarioName}
+                      />
+                    </div>
+                    <div className='d-flex flex-column gap-1'>
+                      <Title level={5} className='text-align-center'>Excel values</Title>
+                      <div className='d-flex gap-3'>
+                        <Button
+                          type='primary'
+                          icon={<DownloadOutlined />}
+                          onClick={() => writeArrayToExcel(scenarioScreensToRefArray(filteredScreens), 'Scenario values.xlsx')}
+                        >
+                          Download
+                        </Button>
+                        <Button
+                          type='primary'
+                          icon={<UploadOutlined />}
+                          onClick={() => document.getElementById('excelFileUpload').click()}
+                        >
+                          Upload
+                        </Button>
                         <input
-                          type="file"
-                          id="xlsFileUpload"
+                          type='file'
+                          id='excelFileUpload'
                           style={{ display: 'none' }}
-                          onChange={handleFileUpload}
+                          onChange={handleExcelUpload}
                         />
                       </div>
                     </div>
-                  )}
-                </div>
-
-                {currentScenario?.screens?.map((screen, i) => {
-                  const screenNameID = screen.screenName.replace(/\s+/g, '') + i;
-                  if (editEnabled && !screensChecked[i]) return null;
-
-                  return (
-                    <ScreenAccordion
-                      key={screen.screenName + screen.actions.length + i}
-                      screen={screen}
-                      screenNameID={screenNameID}
-                      screenSelected={screensChecked[i] || false}
-                      toggleScreenSelection={() => checkScreen(i)}
-                      editEnabled={editEnabled || editScenarioInfo?.id}
-                      onChange={(j, value) => handleChange(i, j, value)}
-                    />
-                  )
-                })}
+                  </div>
+                )}
               </div>
 
-              <div className='scenario-actions-container d-flex gap-3 justify-content-end'>
-                {(!editScenarioInfo?.id && !editEnabled) ? (
+              <Collapse
+                activeKey={editEnabled ? filteredScreens.map((_, i) => i) : undefined}
+                expandIconPosition='end'
+                items={
+                  filteredScreens.map((screen, i) => ({
+                    key: i,
+                    showArrow: !editEnabled,
+                    label: (
+                      <div className='d-flex align-items-center gap-2'>
+                        {(!editEnabled) &&
+                          <Checkbox
+                            checked={editEnabled || screensChecked[i]}
+                            onClick={(e) => { e.stopPropagation(); checkScreen(i); }}
+                          />
+                        }
+                        <Text>{toTitleCase(screen.screenName)}</Text>
+                      </div>
+                    ),
+                    children: (
+                      <Table
+                        pagination={false}
+                        bordered
+                        size='small'
+                        rowKey={(record) => `${screen.screenName}-${record.screenIndex}-${record.actionIndex}`}
+                        columns={[
+                          {
+                            title: 'Field Name',
+                            className: 'w-50',
+                            dataIndex: 'actionName',
+                            key: 'actionName',
+                            render: (text) => <Text>{text}</Text>,
+                          },
+                          {
+                            title: 'Value',
+                            className: 'w-50',
+                            dataIndex: 'value',
+                            key: 'value',
+                            render: (text, record) => (
+                              <Input
+                                className='w-100'
+                                value={text}
+                                disabled={!record.editEnabled}
+                                onChange={(e) => {
+                                  const newScreenValues = { ...screenValues };
+                                  newScreenValues[`${record.screenIndex},${record.actionIndex}`] = e.target.value;
+                                  setScreenValues(newScreenValues);
+                                }}
+                              />
+                            ),
+                          },
+                        ]}
+                        dataSource={
+                          screen.actions.map(({ action, options, selector }, j) => {
+                            if (!['fill', 'selectOption'].includes(action)) return null;
+
+                            return ({
+                              key: `${screen.screenName}-${j}`,
+                              actionName: toTitleCase(options?.name || selector),
+                              value: screenValues[`${i},${j}`] || '',
+                              editEnabled,
+                              screenIndex: i,
+                              actionIndex: j,
+                            });
+                          }).filter(Boolean) // Filter out null values
+                        }
+                      />
+                    ),
+                  }))
+                }
+              />
+
+              <div className='d-flex justify-content-end gap-3'>
+                {(!editEnabled) && (
                   <>
-                    <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => navigate('/dashboard')}>
+                    <Button
+                      icon={<CloseOutlined />}
+                      onClick={() => navigate('/dashboard')}
+                      danger
+                    >
                       Cancel
                     </Button>
-                    <Button variant='primary' onClick={handleNext}>
+                    <Button
+                      type='primary'
+                      onClick={handleNext}
+                    >
                       Next
                     </Button>
                   </>
-                ) : (
+                )}
+
+                {(editEnabled) && (
                   <>
-                    <Button className='border-dark-subtle border-1' variant='secondary' onClick={() => editScenarioInfo?.id ? navigate('/dashboard') : setEditEnabled(false)}>
+                    <Button
+                      icon={<ArrowLeftOutlined />}
+                      onClick={() => setEditEnabled(false)}
+                      danger
+                    >
                       Back
                     </Button>
-                    <Button variant='primary' onClick={!editScenarioInfo?.id ? handleSave : handleEdit}>
-                      Save
+                    <Button
+                      type='primary'
+                      onClick={handleSubmit}
+                    >
+                      Submit
                     </Button>
                   </>
                 )}
               </div>
-            </>
-          )}
-        </div>
-        <Modal size='xl' centered show={fillErrors.length} onHide={() => setFillErrors([])}>
-          <Modal.Header closeButton>
-            <Modal.Title>Failed to fill</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p className='mb-3'>We could not fill the values shown below. Please add them manually & verify the filled values too</p>
-            <table className="table table-bordered m-0">
-              <thead>
-                <tr>
-                  <th className="table-heading">Screen Name</th>
-                  <th className="table-heading">Field Name</th>
-                  <th className="table-heading">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fillErrors.map(row => (
-                  <tr>
-                    <td>{row['Screen Name']}</td>
-                    <td>{row['Field Name']}</td>
-                    <td>{row['Value']}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Modal.Body>
-        </Modal>
-      </>
+            </div>
+          </>
+        }
+      </div>
     </DefaultLayout>
   );
 };

@@ -4,6 +4,19 @@ import { notify } from 'src/notify';
 
 import { clearData } from "src/store/actions";
 
+let tokenExpiredNotified = false;
+
+function debounceTokenExpiredNotification() {
+  if (!tokenExpiredNotified) {
+    tokenExpiredNotified = true;
+    store.dispatch(clearData());
+    notify.error('Session expired. Please log in again.');
+    setTimeout(() => {
+      tokenExpiredNotified = false;
+    }, 2000); // 2 seconds debounce, adjust as needed
+  }
+}
+
 const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
@@ -25,11 +38,8 @@ http.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error?.response?.data?.message === 'Token expired') {
-        // Handle token expiration here
-        store.dispatch(clearData());
-        notify.error('Session expired. Please log in again.');
+        debounceTokenExpiredNotification();
     }
-
     return Promise.reject(error);
   }
 );

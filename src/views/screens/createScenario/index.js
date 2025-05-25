@@ -1,1 +1,1 @@
-export { default } from './createScenario';
+export {default} from './createScenario';

@@ -1,34 +1,37 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import { useState, useEffect, useMemo } from 'react';
+import { Button, Modal, Table, Typography } from 'antd';
+import { EyeOutlined, SyncOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 
 import { notify } from 'src/notify';
 
 import { toTitleCase } from 'src/utils';
-import { getReports } from 'src/http/requests';
+import { getReports, getUserScenarios } from 'src/http';
 
 import DefaultLayout from 'src/views/layouts/default';
 
 import './reports.scss';
 
+const { Title } = Typography;
+
 const Report = () => {
   const userScenarios = useSelector((state) => state.userScenarios);
   const userReports = useSelector((state) => state.userReports);
 
-  const [reportURL, setReportURL] = useState(null);
+  const [selectedReport, setSelectedReport] = useState();
   const [disableRefresh, setDisableRefresh] = useState(false);
 
   useEffect(() => {
     getReports();
+    getUserScenarios();
   }, []);
 
   useEffect(() => {
-    if (reportURL) {
+    if (selectedReport?.filePath) {
       var iframe = document.getElementById('reportiframe');
-      iframe.src = (import.meta.env.VITE_API_URL || '') + reportURL;
+      iframe.src = `${import.meta.env.VITE_API_URL || ''}${selectedReport?.filePath}`;
     }
-  }, [reportURL]);
+  }, [selectedReport?.filePath]);
 
   const scenarioIdMap = useMemo(() => {
     return Object.fromEntries(userScenarios.map(({ id, name }) => [id, name]))
@@ -45,69 +48,80 @@ const Report = () => {
     <>
       <DefaultLayout>
         <div className='reports-container position-relative d-flex flex-column gap-4'>
-          <p className='reports-heading m-0'>User Reports</p>
-          {userReports.length === 0 ? (
-            <div className='no-reports-container flex-grow-1 d-flex align-items-center justify-content-center'>
-              <p className='no-reports-text'>No reports available</p>
+          <Title className='reports-heading'>User Reports</Title>
+          <div className='reports-table-container d-flex flex-column gap-3'>
+            <div className='reports-actions-container d-flex justify-content-end'>
+              <Button type='primary' disabled={disableRefresh} icon={<SyncOutlined />} onClick={refreshReports}>
+                Refresh
+              </Button>
             </div>
-          ) : (
-            <div className='reports-table-container d-flex flex-column gap-3'>
-              <div className='reports-actions-container d-flex justify-content-end'>
-                <Button variant='primary' disabled={disableRefresh} onClick={refreshReports}>
-                  <i className="bi bi-arrow-clockwise me-1" />
-                  Refresh
-                </Button>
-              </div>
-              <table className='reports-table table table-bordered'>
-                <thead>
-                  <tr>
-                    <th className='text-nowrap'>S. No</th>
-                    <th className='w-100'>Scenarios</th>
-                    <th className='text-nowrap'>Status</th>
-                    <th className='text-nowrap'>Executed At</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    userReports?.map((report, index) => (
-                      <tr key={index}>
-                        <td className='text-nowrap'>{index + 1}</td>
-                        <td className='w-100'>{report.scenarioIds.map(id => scenarioIdMap[id]).join(', ')}
-                        </td>
-                        <td className='text-nowrap'>{toTitleCase(report.status)}</td>
-                        <td className='text-nowrap'>{new Date(report.executedAt).toLocaleString()}</td>
-                        <td className='text-nowrap'>
-                          {report.filePath !== null && (
-                            <Button variant='primary' size='sm' onClick={() => setReportURL(report.filePath)}>
-                              View Report
-                            </Button>
-                          )}
-                        </td>
-                      </tr>
-                    ))
-                  }
-                </tbody>
-              </table>
-            </div>
-          )}
+            <Table
+              className='reports-table'
+              bordered
+              columns={[
+                {
+                  title: 'S. No',
+                  dataIndex: 'index',
+                  key: 'index',
+                  className: 'text-nowrap',
+                  render: (text, record, index) => index + 1,
+                },
+                {
+                  title: 'Scenarios',
+                  dataIndex: 'scenarios',
+                  key: 'scenarios',
+                  width: '100%',
+                  render: (text, record) => record.scenarios.map(({ scenarioId }) => scenarioIdMap[scenarioId]).join(', ')
+                },
+                {
+                  title: 'Status',
+                  dataIndex: 'status',
+                  key: 'status',
+                  render: (text, record) => toTitleCase(record.status),
+                },
+                {
+                  title: 'Executed At',
+                  dataIndex: 'executedAt',
+                  key: 'executedAt',
+                  className: 'text-nowrap',
+                  render: (text, record) => new Date(record.executedAt).toLocaleString(),
+                },
+                {
+                  title: 'Action',
+                  dataIndex: 'action',
+                  key: 'action',
+                  render: (text, record) => (
+                    ['completed', 'failed'].includes(record.status) && (
+                      <Button icon={<EyeOutlined />} onClick={() => setSelectedReport(record)}>
+                        View Report
+                      </Button>
+                    )
+                  ),
+                }
+              ]}
+              dataSource={userReports}
+              rowKey={(record) => record.id}
+            />
+          </div>
         </div >
-      </DefaultLayout >
-      <Modal fullscreen centered show={!!reportURL} onHide={() => setReportURL(null)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Report</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      </DefaultLayout>
 
-          <iframe
-            id='reportiframe'
-            src={reportURL}
-            title="Report"
-            className="report-iframe"
-            width={"100%"}
-            height={"100%"}
-          />
-        </Modal.Body>
+      {/* View Report Modal */}
+      <Modal
+        centered
+        open={!!selectedReport}
+        onCancel={() => setSelectedReport(null)}
+        footer={null}
+        title={selectedReport?.scenarios.map(({ scenarioId }) => scenarioIdMap[scenarioId]).join(', ')}
+        width='100%'
+      >
+        <iframe
+          id='reportiframe'
+          title='Report'
+          className='report-iframe'
+          width='100%'
+          height={600}
+        />
       </Modal>
     </>
   );

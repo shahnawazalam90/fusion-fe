@@ -13,18 +13,28 @@
       height: 40px;
     }
 
-    .header-menu-button,
+    .header-menu-button {
+      border: none;
+      background: none;
+
+      .menu-button-icon {
+        color: #195F8A;
+        font-size: 24px;
+      }
+    }
+
     .header-logout-button {
       border: none;
       background: none;
 
-      .menu-button-icon,
       .logout-button-icon {
+        color: #ff4d4f;
         font-size: 24px;
       }
     }
 
     .menu-profile-icon {
+      color: #195F8A;
       font-size: 24px;
     }
   }
@@ -35,7 +45,7 @@
 
     .menu-container {
       width: 60px;
-      height: calc(100vh - #{$header-height} - #{$menu-gutter * 2});
+      height: calc(100vh - #{$header-height} - #{$footer-height} - #{$menu-gutter * 2});
       top: calc(#{$header-height} + #{$menu-gutter});
       left: -$menu-width;
       background: #17567C;
@@ -52,7 +62,7 @@
       }
 
       .menu-item {
-        background: none  ;
+        background: none;
         border: none;
         font-size: 24px;
         color: #E8EFF3;
@@ -72,7 +82,7 @@
     }
 
     .body-content-wrapper {
-      padding: $body-padding;      
+      padding: $body-padding;
       transition: padding 0.3s ease-in-out;
     }
   }

@@ -1,7 +1,10 @@
+import { Checkbox, Collapse } from 'antd';
+import { DeleteOutlined, EditOutlined, SyncOutlined } from '@ant-design/icons';
+import classNames from "classnames";
+
 import { toTitleCase } from "src/utils.js";
 
 import './screenAccordion.scss';
-import classNames from "classnames";
 
 export default function ScreenAccordion({
   screen,
