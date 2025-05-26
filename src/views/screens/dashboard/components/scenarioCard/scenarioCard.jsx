@@ -150,14 +150,14 @@ const ScenarioCard = ({ scenario, scenariosValues, selected, handleValueChange, 
               size='small'
               onClick={e => {
                 e.stopPropagation();
-                document.getElementById('excelFileUpload').click();
+                document.getElementById(`${scenario.id}excelFileUpload`).click();
               }}
             >
               Upload
             </Button>
             <input
               type='file'
-              id='excelFileUpload'
+              id={`${scenario.id}excelFileUpload`}
               style={{ display: 'none' }}
               onClick={e => e.stopPropagation()}
               onChange={onExcelUpload}

@@ -62,7 +62,7 @@ export const checkExcelValidity = (excelData, scenarioScreens) => {
     row.forEach((value, j) => {
       if (j >= 3 || !canProcess) return; // Skip 'Value' columns
 
-      if (value !== scenarioScreens[i][j]) {
+      if (value !== scenarioScreens[i]?.[j]) {
         canProcess = false;
         notify.error('Uploaded file does not match the scenario structure. Please check the file and try again.');
         return;
