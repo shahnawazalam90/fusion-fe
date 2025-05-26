@@ -207,6 +207,17 @@ body {
       flex-direction: column-reverse;
     }
 
+    // Flex Wrap
+    &-wrap {
+      flex-wrap: wrap;
+    }
+    &-nowrap {
+      flex-wrap: nowrap;
+    }
+    &-wrap-reverse {
+      flex-wrap: wrap-reverse;
+    }
+
     // Flex Grow
     &-grow {
       &-0 {
