@@ -1,1 +1,1 @@
-export { default } from './ScenarioCard';
+export { default } from './scenarioCard';
