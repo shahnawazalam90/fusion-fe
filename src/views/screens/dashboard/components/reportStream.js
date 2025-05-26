@@ -1,4 +1,4 @@
-export const reportStreamHTML = (reportId) => (`
+export const reportStreamHTML = (reportId, apiUrl) => (`
     <!DOCTYPE html>
     <html>
       <head>
@@ -59,6 +59,7 @@ export const reportStreamHTML = (reportId) => (`
         <script>
           (function() {
             const reportId = '${reportId}';
+            const apiUrl = '${apiUrl}';
             let retryCount = 0;
             const maxRetries = 3;
             const retryDelay = 2000;
@@ -88,7 +89,7 @@ export const reportStreamHTML = (reportId) => (`
                 eventSource.close();
               }
 
-              eventSource = new EventSource(import.meta.env.VITE_API_URL + '/api/v1/reports/' + reportId + '/stream');
+              eventSource = new EventSource(apiUrl + '/api/v1/reports/' + reportId + '/stream');
 
               eventSource.onopen = () => {
                 updateStatus('connecting');

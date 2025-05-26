@@ -129,7 +129,7 @@ const Dashboard = () => {
     const streamWindow = window.open('', '_blank', 'width=800,height=600');
 
     // Create the HTML content with embedded JavaScript
-    const html = reportStreamHTML(reportId);
+    const html = reportStreamHTML(reportId, import.meta.env.VITE_API_URL);
 
     // Write the HTML to the new window
     streamWindow.document.write(html);
