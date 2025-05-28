@@ -156,7 +156,7 @@ const EditScenario = () => {
                     <Title level={5}>Request</Title>
                     <Select
                       name='Request'
-                      value={requestId}
+                      value={requestId || null}
                       onChange={setRequestId}
                       options={[
                         { label: 'None', value: null },
