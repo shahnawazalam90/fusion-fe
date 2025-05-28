@@ -2,6 +2,7 @@ import { NavLink } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { Button, Popconfirm, Typography } from 'antd';
 import {
+  ApiOutlined,
   ClockCircleOutlined,
   CloudUploadOutlined,
   FileTextOutlined,
@@ -38,6 +39,10 @@ const menuItems = [
     icon: <ClockCircleOutlined />,
     title: 'Schedules',
     path: '/schedules',
+  }, {
+    icon: <ApiOutlined />,
+    title: 'Requests',
+    path: '/requests',
   }
 ];
 
@@ -82,7 +87,7 @@ const DefaultLayout = ({ className, children }) => {
       <div className='body-container flex-grow-1 d-flex'>
         <div className={classNames('menu-container position-fixed d-flex flex-column py-4', { 'active': showMenu })}>
           <div className='menu-items d-flex flex-column gap-3'>
-            {menuItems.map((item, index) => (
+            {menuItems?.map((item, index) => (
               <button
                 key={index}
                 title={item.title}

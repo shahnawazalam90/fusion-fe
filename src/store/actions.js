@@ -9,7 +9,8 @@ import {
   SET_USER_SCENARIOS,
   SET_USER_REPORTS,
   SET_CURRENT_REPORT,
-  SET_SCHEDULES
+  SET_SCHEDULES,
+  SET_REQUESTS
 } from './actionTypes';
 
 export const clearData = () => ({
@@ -64,4 +65,9 @@ export const setCurrentReport = ({ scenarioName, reportURL }) => ({
 export const setSchedules = (schedules) => ({
   type: SET_SCHEDULES,
   payload: schedules,
+});
+
+export const setRequests = (requests) => ({
+  type: SET_REQUESTS,
+  payload: requests,
 });

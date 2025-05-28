@@ -26,7 +26,7 @@ const Schedules = () => {
   }, []);
 
   const scenarioIdMap = useMemo(() => {
-    return Object.fromEntries(userScenarios.map(({ id, name }) => [id, name]))
+    return Object.fromEntries(userScenarios?.map(({ id, name }) => [id, name]))
   }, [userScenarios]);
 
   const refreshSchedules = () => {
@@ -90,7 +90,7 @@ const Schedules = () => {
                   dataIndex: 'scenarios',
                   key: 'scenarios',
                   width: '100%',
-                  render: (text, record) => record.scenarios.map(({ scenarioId }) => scenarioIdMap[scenarioId]).join(', ')
+                  render: (text, record) => record?.scenarios?.map(({ scenarioId }) => scenarioIdMap[scenarioId]).join(', ')
                 },
                 {
                   title: 'Pending / Executed',

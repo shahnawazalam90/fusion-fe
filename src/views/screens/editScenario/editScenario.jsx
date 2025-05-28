@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Button, Checkbox, Collapse, Empty, Input, Table, Typography } from 'antd';
+import { Button, Checkbox, Collapse, Empty, Input, Select, Table, Typography } from 'antd';
 import { ArrowLeftOutlined, CloseOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router";
 import { useSelector } from 'react-redux';
 
-import { getScenarioById, updateScenario } from "src/http";
+import { getScenarioById, updateScenario, listRequests } from "src/http";
 import { toTitleCase, writeArrayToExcel, readExcelToArray, scenarioScreensToRefArray, checkExcelValidity } from "src/utils";
 import { notify } from 'src/notify';
 
@@ -18,17 +18,21 @@ const EditScenario = () => {
   const navigate = useNavigate();
   const currentScenario = useSelector((state) => state.currentScenario);
   const editScenarioInfo = useSelector((state) => state.editScenarioInfo);
+  const requests = useSelector((state) => state.requests);
 
   const [screenValues, setScreenValues] = useState({});
   const [scenarioName, setScenarioName] = useState('');
+  const [requestId, setRequestId] = useState(null);
   const [scenarioURL, setScenarioURL] = useState('');
 
   useEffect(() => {
     getScenarioById(editScenarioInfo?.id).then((scenario) => {
       setScenarioName(editScenarioInfo.name || '');
+      setRequestId(scenario.requestId || null);
       setScenarioURL(scenario.url || '');
       setScreenValues(Object.fromEntries(scenario.dataManual));
     });
+    listRequests();
   }, [editScenarioInfo]);
 
   const handleExcelDownload = () => {
@@ -37,7 +41,7 @@ const EditScenario = () => {
     if (currentScenario.dataManual) {
       const excelData = currentScenario.dataManual;
 
-      scenarioRefArray = scenarioRefArray.map((row, i) => {
+      scenarioRefArray = scenarioRefArray?.map((row, i) => {
         if (i === 0) return row; // Skip header row
 
         const [id, screen, fieldName] = row;
@@ -100,7 +104,8 @@ const EditScenario = () => {
       editScenarioInfo?.id,
       scenarioName,
       scenarioURL,
-      JSON.stringify(Object.keys(screenValues).map((key) => [key, screenValues[key]]))
+      JSON.stringify(Object.keys(screenValues)?.map((key) => [key, screenValues[key]])),
+      requestId
     ).then((res) => {
       if (res.status === 'success') {
         notify.success('Scenario updated successfully!');
@@ -136,7 +141,7 @@ const EditScenario = () => {
         {(currentScenario?.screens?.length !== 0) &&
           <>
             <div className='d-flex flex-column gap-3'>
-              <div className="d-flex align-items-center">
+              <div className="d-flex flex-column gap-1">
                 <div className='d-flex gap-3 w-100'>
                   <div className='d-flex flex-column gap-1 flex-grow-1'>
                     <Title level={5}>Scenario Name <Text type='danger'>*</Text></Title>
@@ -147,13 +152,19 @@ const EditScenario = () => {
                       value={scenarioName}
                     />
                   </div>
-                  <div className='d-flex flex-column gap-1 flex-grow-1'>
-                    <Title level={5}>Scenario URL <Text type='danger'>*</Text></Title>
-                    <Input
-                      name='Scenario URL'
-                      placeholder='Enter Scenario URL'
-                      onChange={e => setScenarioURL(e.target.value)}
-                      value={scenarioURL}
+                  <div className='d-flex flex-column gap-1 w-33'>
+                    <Title level={5}>Request</Title>
+                    <Select
+                      name='Request'
+                      value={requestId}
+                      onChange={setRequestId}
+                      options={[
+                        { label: 'None', value: null },
+                        ...(requests ? requests.map((request) => ({
+                          label: request.name,
+                          value: request.id,
+                        })) : []),
+                      ]}
                     />
                   </div>
                   <div className='d-flex flex-column gap-1'>
@@ -182,13 +193,22 @@ const EditScenario = () => {
                     </div>
                   </div>
                 </div>
+                <div className='d-flex flex-column gap-1 flex-grow-1'>
+                  <Title level={5}>Scenario URL <Text type='danger'>*</Text></Title>
+                  <Input
+                    name='Scenario URL'
+                    placeholder='Enter Scenario URL'
+                    onChange={e => setScenarioURL(e.target.value)}
+                    value={scenarioURL}
+                  />
+                </div>
               </div>
 
               <Collapse
-                activeKey={currentScenario.screens.map((_, i) => i)}
+                activeKey={currentScenario?.screens?.map((_, i) => i)}
                 expandIconPosition='end'
                 items={
-                  currentScenario.screens.map((screen, i) => ({
+                  currentScenario?.screens?.map((screen, i) => ({
                     key: i,
                     showArrow: false,
                     label: (
@@ -229,7 +249,7 @@ const EditScenario = () => {
                           },
                         ]}
                         dataSource={
-                          screen.actions.map(({ action, options, selector }, j) => {
+                          screen?.actions?.map(({ action, options, selector }, j) => {
                             if (!['fill', 'selectOption'].includes(action)) return null;
 
                             return ({
@@ -239,7 +259,7 @@ const EditScenario = () => {
                               screenIndex: i,
                               actionIndex: j,
                             });
-                          }).filter(Boolean) // Filter out null values
+                          })?.filter(Boolean) // Filter out null values
                         }
                       />
                     ),

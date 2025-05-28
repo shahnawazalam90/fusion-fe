@@ -8,6 +8,7 @@ const initialState = {
   userReports: [],
   currentReport: {},
   schedules: [],
+  requests: [],
 };
 
 export default initialState;

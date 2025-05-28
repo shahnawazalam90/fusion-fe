@@ -25,6 +25,7 @@ export const getScenarioById = async (scenarioId) => {
       screens: JSON.parse(response?.data?.jsonMetaData),
       url: response?.data?.url,
       dataManual: JSON.parse(response?.data?.dataManual),
+      requestId: response?.data?.requestId,
     };
 
     store.dispatch(setCurrentScenario(scenario));
@@ -68,13 +69,14 @@ export const getScenariosJSON = async (scenarioIds) => {
   }
 };
 
-export const postScenario = async (name, screenUrl, jsonMetaData, dataManual) => {
+export const postScenario = async (name, screenUrl, jsonMetaData, dataManual, requestId) => {
   const url = '/api/v1/scenarios/';
   const payload = new URLSearchParams();
   payload.append('name', name);
   payload.append('url', screenUrl);
   payload.append('jsonMetaData', jsonMetaData);
   payload.append('dataManual', dataManual);
+  payload.append('requestId', requestId);
 
   try {
     const response = await post(url, payload, {
@@ -89,13 +91,14 @@ export const postScenario = async (name, screenUrl, jsonMetaData, dataManual) =>
   }
 };
 
-export const updateScenario = async (scenarioId, name, screenUrl, dataManual) => {
+export const updateScenario = async (scenarioId, name, screenUrl, dataManual, requestId) => {
   const url = '/api/v1/scenarios/update';
   const payload = new URLSearchParams();
   payload.append('id', scenarioId);
   payload.append('name', name);
   payload.append('screenUrl', screenUrl);
   payload.append('dataManual', dataManual);
+  payload.append('requestId', requestId);
 
   try {
     const response = await put(url, payload, {

@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Button, Checkbox, Collapse, Empty, Input, Table, Typography } from 'antd';
+import { Button, Checkbox, Collapse, Empty, Input, Select, Table, Typography } from 'antd';
 import { ArrowLeftOutlined, CloseOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router";
 import { useSelector } from 'react-redux';
 
-import { getLatestScenario, postScenario } from "src/http";
+import { getLatestScenario, postScenario, listRequests } from "src/http";
 import { toTitleCase, writeArrayToExcel, readExcelToArray, scenarioScreensToRefArray, checkExcelValidity } from "src/utils";
 import { notify } from 'src/notify';
 
@@ -17,11 +17,13 @@ const { Text, Title } = Typography;
 const CreateScenario = () => {
   const navigate = useNavigate();
   const currentScenario = useSelector((state) => state.currentScenario);
+  const requests = useSelector((state) => state.requests);
 
   const [screensChecked, setScreensChecked] = useState([]);
   const [screenValues, setScreenValues] = useState({});
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
+  const [requestId, setRequestId] = useState(null);
   const [scenarioURL, setScenarioURL] = useState('');
 
   const filteredScreens = useMemo(() => {
@@ -31,7 +33,7 @@ const CreateScenario = () => {
   const allScreensSelected = useMemo(() => {
     if (screensChecked.length === 0) return false;
 
-    return screensChecked.find((checked) => !checked) === undefined;
+    return screensChecked?.find((checked) => !checked) === undefined;
   }, [screensChecked]);
 
   useEffect(() => {
@@ -43,20 +45,24 @@ const CreateScenario = () => {
       setScreensChecked(screensCheckedNew);
       setScenarioURL(scenario.url);
     });
+    listRequests();
   }, []);
 
   useEffect(() => {
     const screenValuesNew = {};
     filteredScreens.forEach(({ actions }, i) => {
-      actions.forEach((_, j) => {
-        screenValuesNew[`${i},${j}`] = '';
+      actions.forEach((action, j) => {
+        if (['fill', 'selectOption'].includes(action.action)) {
+          screenValuesNew[`${i},${j}`] = '';
+        }
       });
     });
+
     setScreenValues(screenValuesNew);
   }, [filteredScreens]);
 
   const checkAllScreens = () => {
-    const updatedScreensChecked = screensChecked.map(() => (!allScreensSelected));
+    const updatedScreensChecked = screensChecked?.map(() => (!allScreensSelected));
     setScreensChecked(updatedScreensChecked);
   };
 
@@ -69,7 +75,7 @@ const CreateScenario = () => {
   };
 
   const handleNext = () => {
-    if (!screensChecked.find((checked) => checked)) {
+    if (!screensChecked?.find((checked) => checked)) {
       notify.error('At least one screen is required.');
       return;
     }
@@ -119,7 +125,13 @@ const CreateScenario = () => {
       return;
     }
 
-    postScenario(scenarioName, scenarioURL, JSON.stringify(filteredScreens), JSON.stringify(Object.keys(screenValues).map((key) => [key, screenValues[key]])))
+    postScenario(
+      scenarioName,
+      scenarioURL,
+      JSON.stringify(filteredScreens),
+      JSON.stringify(Object.keys(screenValues)?.map((key) => [key, screenValues[key]])),
+      requestId
+    )
       .then((res) => {
         if (res.status === 'success') {
           notify.success('Scenario created successfully!');
@@ -174,6 +186,21 @@ const CreateScenario = () => {
                         value={scenarioName}
                       />
                     </div>
+                    <div className='d-flex flex-column gap-1 w-33'>
+                      <Title level={5}>Request</Title>
+                      <Select
+                        name='Request'
+                        value={requestId}
+                        onChange={setRequestId}
+                        options={[
+                          { label: 'None', value: null },
+                          ...(requests ? requests.map((request) => ({
+                            label: request.name,
+                            value: request.id,
+                          })) : []),
+                        ]}
+                      />
+                    </div>
                     <div className='d-flex flex-column gap-1'>
                       <Title level={5} className='text-align-center'>Excel values</Title>
                       <div className='d-flex gap-3'>
@@ -204,10 +231,10 @@ const CreateScenario = () => {
               </div>
 
               <Collapse
-                activeKey={editEnabled ? filteredScreens.map((_, i) => i) : undefined}
+                activeKey={editEnabled ? filteredScreens?.map((_, i) => i) : undefined}
                 expandIconPosition='end'
                 items={
-                  filteredScreens.map((screen, i) => ({
+                  filteredScreens?.map((screen, i) => ({
                     key: i,
                     showArrow: !editEnabled,
                     label: (
@@ -255,7 +282,7 @@ const CreateScenario = () => {
                           },
                         ]}
                         dataSource={
-                          screen.actions.map(({ action, options, selector }, j) => {
+                          screen?.actions?.map(({ action, options, selector }, j) => {
                             if (!['fill', 'selectOption'].includes(action)) return null;
 
                             return ({
@@ -266,7 +293,7 @@ const CreateScenario = () => {
                               screenIndex: i,
                               actionIndex: j,
                             });
-                          }).filter(Boolean) // Filter out null values
+                          })?.filter(Boolean) // Filter out null values
                         }
                       />
                     ),

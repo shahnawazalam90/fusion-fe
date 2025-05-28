@@ -11,7 +11,7 @@ export const readExcelToArray = (file, callback) => {
       const worksheet = workbook.Sheets[firstSheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      callback(jsonData.map(row => Object.values(row)));
+      callback(jsonData?.map(row => Object.values(row)));
     } catch (error) {
       console.error('Error reading Excel file:', error);
       notify.error('Failed to read the Excel file. Please try again.');

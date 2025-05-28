@@ -45,7 +45,7 @@ const Dashboard = () => {
     setScenariosValues(initialScenariosValues);
   }, [userScenarios]);
 
-  const disableScenarioActions = useMemo(() => !Object.values(selectedScenarios).find((x) => x), [selectedScenarios]);
+  const disableScenarioActions = useMemo(() => !Object.values(selectedScenarios)?.find((x) => x), [selectedScenarios]);
 
   const handleScenarioClick = (scenarioId) => {
     setSelectedScenarios({
@@ -90,7 +90,7 @@ const Dashboard = () => {
 
   const mapSelectedScenarioValues = () => {
     return Object.keys(selectedScenarios)
-      .map((scenarioId) => ({ scenarioId, valuesType: scenariosValues[scenarioId] }));
+      ?.map((scenarioId) => ({ scenarioId, valuesType: scenariosValues[scenarioId] }));
   };
 
   const handleScenarioExecute = () => {
@@ -100,7 +100,12 @@ const Dashboard = () => {
           setSelectedScenarios({});
           openTestStreamWindow(data.id);
           notify.success('Scenario(s) started executing successfully!');
+        } else {
+          notify.error('Failed to execute scenario(s). Please try again.');
         }
+      })
+      .catch(() => {
+        notify.error('Something went wrong while trying to execute the scenario(s).');
       });
   };
 
@@ -156,7 +161,7 @@ const Dashboard = () => {
             </div>
             <div className='scenario-grid-container flex-grow-1'>
               <div className='scenario-grid-wrapper align-items-start d-flex flex-wrap'>
-                {userScenarios.map((scenario) => (
+                {userScenarios?.map((scenario) => (
                   <ScenarioCard
                     key={scenario.id}
                     scenario={scenario}

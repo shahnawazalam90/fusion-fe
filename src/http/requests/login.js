@@ -8,11 +8,14 @@ export const login = async (email, password) => {
 
   try {
     const response = await post(url, payload);
-    // Dispatch the user and token to the Redux store
-    store.dispatch(setUser({
-      user: response.data.user,
-      token: response.data.token,
-    }));
+
+    if (response.status === 'success') {
+      await store.dispatch(setUser({
+        user: response.data.user,
+        token: response.data.token,
+      }));
+    }
+
     return response;
   } catch (error) {
     console.error('Login request failed:', error);

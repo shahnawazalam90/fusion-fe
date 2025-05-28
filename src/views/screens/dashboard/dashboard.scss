@@ -13,6 +13,7 @@ $scenario-card-gutter: 16px;
 
         .scenario-card {
           width: calc((100% - #{$scenario-card-gutter} * 3)/4);
+          min-width: 274px; // Minimum width for the scenario card
 
           .scenario-card-body {
             .scenario-actions {

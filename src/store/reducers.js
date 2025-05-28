@@ -9,7 +9,8 @@ import {
   SET_USER_SCENARIOS,
   SET_USER_REPORTS,
   SET_CURRENT_REPORT,
-  SET_SCHEDULES
+  SET_SCHEDULES,
+  SET_REQUESTS
 } from './actionTypes';
 import initialState from './initialState';
 
@@ -19,8 +20,8 @@ const rootReducer = (state = initialState, action) => {
       return initialState;
     case SET_MENU_VISIBILITY:
       return { ...state, menu_visibility: action.payload };
-    case SET_USER:
-      return { ...state, user: action.payload };
+    case SET_USER: // Clear all data and set user
+      return { ...initialState, user: action.payload };
     case SET_POSTS:
       return { ...state, posts: action.payload };
     case SET_CURRENT_SCENARIO:
@@ -33,11 +34,11 @@ const rootReducer = (state = initialState, action) => {
         // Create a deep copy of currentScenario
         const currentScenario = { ...state.currentScenario };
 
-        currentScenario.screens = currentScenario.screens.map((scenario, index) =>
+        currentScenario.screens = currentScenario?.screens?.map((scenario, index) =>
           index === parentIndex
             ? {
               ...scenario,
-              actions: scenario.actions.map((action, idx) =>
+              actions: scenario?.actions?.map((action, idx) =>
                 idx === childIndex ? { ...action, value } : action
               ),
             }
@@ -64,6 +65,11 @@ const rootReducer = (state = initialState, action) => {
       return {
         ...state,
         schedules: action.payload,
+      };
+    case SET_REQUESTS:
+      return {
+        ...state,
+        requests: action.payload,
       };
     default:
       return state;

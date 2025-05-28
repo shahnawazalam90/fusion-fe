@@ -47,6 +47,7 @@
       width: 60px;
       height: calc(100vh - #{$header-height} - #{$footer-height} - #{$menu-gutter * 2});
       top: calc(#{$header-height} + #{$menu-gutter});
+      overflow: hidden;
       left: -$menu-width;
       background: #17567C;
       border-radius: 10px;

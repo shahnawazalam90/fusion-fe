@@ -9,6 +9,7 @@ import CreateScenario from 'src/views/screens/createScenario';
 import EditScenario from 'src/views/screens/editScenario';
 import Reports from 'src/views/screens/reports';
 import Schedules from 'src/views/screens/schedules';
+import Requests from 'src/views/screens/requests';
 function AppRoutes() {
   const user = useSelector((state) => state.user);
 
@@ -50,6 +51,12 @@ function AppRoutes() {
           path="/schedules"
           element={
             <PrivateRoute user={user} children={<Schedules />} />
+          }
+        />
+        <Route
+          path="/requests"
+          element={
+            <PrivateRoute user={user} children={<Requests />} />
           }
         />
         <Route path="/*" element={<Navigate to={user?.token ? "/dashboard" : "/login"} />} />

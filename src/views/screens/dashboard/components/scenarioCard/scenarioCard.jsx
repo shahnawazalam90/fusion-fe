@@ -17,7 +17,7 @@ const ScenarioCard = ({ scenario, scenariosValues, selected, handleValueChange, 
     if (scenario.dataExcel) {
       const excelData = JSON.parse(scenario.dataExcel);
 
-      scenarioRefArray = scenarioRefArray.map((row, i) => {
+      scenarioRefArray = scenarioRefArray?.map((row, i) => {
         if (i === 0) return row; // Skip header row
 
 
@@ -53,11 +53,11 @@ const ScenarioCard = ({ scenario, scenariosValues, selected, handleValueChange, 
       let canProcess = checkExcelValidity(excelData, scenarioRefArray);
 
       if (canProcess) {
-        const excelDataCopy = excelData.map(([id, , , ...values], i) => { // Extract id, screen (ignore), fieldName (ignore) and values
+        const excelDataCopy = excelData?.map(([id, , , ...values], i) => { // Extract id, screen (ignore), fieldName (ignore) and values
           if (i === 0) return; // Skip header row
 
           return [id, ...values];
-        }).filter(row => row); // Remove undefined rows
+        })?.filter(row => row); // Remove undefined rows
 
         handleExcelUpload(JSON.stringify(excelDataCopy));
       }
@@ -110,59 +110,53 @@ const ScenarioCard = ({ scenario, scenariosValues, selected, handleValueChange, 
           <Text>{new Date(scenario.createdAt).toLocaleString()}</Text>
         </div>
 
-        <Divider className='my-0' />
+        <Divider style={{ margin: 0 }}><Text className='text-nowrap'>Execute with</Text></Divider>
 
-        <div className='d-flex gap-2 align-items-center justify-content-between'>
-          <Text className='text-nowrap'>Execute with</Text>
-          <span onClick={e => e.stopPropagation()}>
-            <Tooltip
-              title={!scenario.dataExcel ? 'Excel values not available yet. Please upload to use this feature.' : ''}
-              color='red'
-            >
-              <Segmented
-                options={[
-                  { label: 'Manual', value: 'manual', icon: <EditOutlined /> },
-                  { label: 'Excel', value: 'excel', icon: <FileExcelOutlined /> },
-                ]}
-                onClick={e => e.stopPropagation()}
-                disabled={!scenario.dataExcel}
-                value={scenariosValues[scenario.id] || 'manual'}
-                onChange={value => handleValueChange(value)}
-              />
-            </Tooltip>
-          </span>
-        </div>
-
-        <Divider className='my-0' />
-
-        <div className='d-flex gap-2 align-items-center justify-content-between'>
-          <Text className='text-nowrap'>Excel values</Text>
-          <div className='d-flex gap-1'>
-            <Button
-              icon={<DownloadOutlined />}
+        <span onClick={e => e.stopPropagation()} className='text-align-center pb-1'>
+          <Tooltip
+            title={!scenario.dataExcel ? 'Excel values not available yet. Please upload to use this feature.' : ''}
+            color='red'
+          >
+            <Segmented
+              options={[
+                { label: 'Manual Values', value: 'manual', icon: <EditOutlined /> },
+                { label: 'Excel Values', value: 'excel', icon: <FileExcelOutlined /> },
+              ]}
               size='small'
-              onClick={onExcelDownload}
-            >
-              Download
-            </Button>
-            <Button
-              icon={<UploadOutlined />}
-              size='small'
-              onClick={e => {
-                e.stopPropagation();
-                document.getElementById(`${scenario.id}excelFileUpload`).click();
-              }}
-            >
-              Upload
-            </Button>
-            <input
-              type='file'
-              id={`${scenario.id}excelFileUpload`}
-              style={{ display: 'none' }}
               onClick={e => e.stopPropagation()}
-              onChange={onExcelUpload}
+              disabled={!scenario.dataExcel}
+              value={scenariosValues[scenario.id] || 'manual'}
+              onChange={value => handleValueChange(value)}
             />
-          </div>
+          </Tooltip>
+        </span>
+
+        <Divider style={{ margin: 0 }}><Text className='text-nowrap'>Excel values</Text></Divider>
+        <div className='d-flex gap-1 justify-content-center'>
+          <Button
+            icon={<DownloadOutlined />}
+            size='small'
+            onClick={onExcelDownload}
+          >
+            Download
+          </Button>
+          <Button
+            icon={<UploadOutlined />}
+            size='small'
+            onClick={e => {
+              e.stopPropagation();
+              document.getElementById(`${scenario.id}excelFileUpload`).click();
+            }}
+          >
+            Upload
+          </Button>
+          <input
+            type='file'
+            id={`${scenario.id}excelFileUpload`}
+            style={{ display: 'none' }}
+            onClick={e => e.stopPropagation()}
+            onChange={onExcelUpload}
+          />
         </div>
       </div>
     </Card>
