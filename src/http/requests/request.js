@@ -15,7 +15,7 @@ export const createRequest = async (request) => {
   payload.append('type', request.type);
   payload.append(
     'pollingOptions',
-    request.type === 'polling' ? JSON.stringify({ pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout }) : {}
+    JSON.stringify(request.type === 'polling' ?  { pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout } : {})
   );
 
   try {
@@ -66,7 +66,7 @@ export const updateRequest = async (id, request) => {
   payload.append('type', request.type);
   payload.append(
     'pollingOptions',
-    request.type === 'polling' ? JSON.stringify({ pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout }) : {}
+    JSON.stringify(request.type === 'polling' ? { pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout } : {})
   );
 
   try {
