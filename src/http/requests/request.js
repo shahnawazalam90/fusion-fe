@@ -13,9 +13,10 @@ export const createRequest = async (request) => {
   payload.append('expectedResponse', JSON.stringify(request.expectedResponse));
   payload.append('payload', JSON.stringify(request.payload));
   payload.append('type', request.type);
-  if (request.type === 'polling') {
-    payload.append('pollingOptions', JSON.stringify({ pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout }));
-  }
+  payload.append(
+    'pollingOptions',
+    request.type === 'polling' ? JSON.stringify({ pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout }) : {}
+  );
 
   try {
     const response = await post(url, payload);
@@ -63,9 +64,10 @@ export const updateRequest = async (id, request) => {
   payload.append('expectedResponse', JSON.stringify(request.expectedResponse));
   payload.append('payload', JSON.stringify(request.payload));
   payload.append('type', request.type);
-  if (request.type === 'polling') {
-    payload.append('pollingOptions', JSON.stringify({ pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout }));
-  }
+  payload.append(
+    'pollingOptions',
+    request.type === 'polling' ? JSON.stringify({ pollingInterval: request.pollingInterval, pollingTimeout: request.pollingTimeout }) : {}
+  );
 
   try {
     const response = await put(url, payload);
