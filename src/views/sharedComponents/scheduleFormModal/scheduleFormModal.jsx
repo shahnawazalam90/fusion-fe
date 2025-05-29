@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { DatePicker, Input, Modal, Typography } from 'antd';
+import { DatePicker, Input, Modal, Select, Typography } from 'antd';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+
+import { executionBrowserOptions } from 'src/utils';
 
 import './scheduleFormModal.scss';
 
@@ -13,17 +15,20 @@ dayjs.extend(timezone);
 const ScheduleFormModal = ({ editSchedule, showModal, onClose, onSubmit }) => {
   const [scheduleName, setScheduleName] = useState('');
   const [scheduleDT, setScheduleDT] = useState();
+  const [selectedBrowser, setSelectedBrowser] = useState(executionBrowserOptions[0].value);
   const [scheduleError, setScheduleError] = useState('');
 
   useEffect(() => {
     if (showModal) {
       setScheduleName('');
       setScheduleDT(new Date());
+      setSelectedBrowser(executionBrowserOptions[0].value);
       setScheduleError('');
     }
     if (editSchedule) {
       setScheduleName(editSchedule.name);
       setScheduleDT(new Date(editSchedule.scheduleTime));
+      setSelectedBrowser(editSchedule.browser || executionBrowserOptions[0].value);
       setScheduleError('');
     }
   }, [showModal, editSchedule]);
@@ -42,7 +47,7 @@ const ScheduleFormModal = ({ editSchedule, showModal, onClose, onSubmit }) => {
       return;
     }
 
-    onSubmit(scheduleName, scheduleDT);
+    onSubmit(scheduleName, scheduleDT, selectedBrowser);
   };
 
   return (
@@ -59,7 +64,6 @@ const ScheduleFormModal = ({ editSchedule, showModal, onClose, onSubmit }) => {
         <div className='d-flex flex-column gap-1'>
           <Title level={5}>Schedule Name <Text type='danger'>*</Text></Title>
           <Input
-            size='large'
             name='Schedule Name'
             placeholder='Enter Schedule Name'
             onChange={e => { setScheduleName(e.target.value); setScheduleError(''); }}
@@ -71,7 +75,6 @@ const ScheduleFormModal = ({ editSchedule, showModal, onClose, onSubmit }) => {
           <Title level={5}>Schedule Date & Time <Text type='danger'>*</Text></Title>
           <DatePicker
             showTime
-            size='large'
             name='Schedule Date'
             placeholder='Select Schedule Date'
             onChange={date => { setScheduleDT(date); setScheduleError(''); }}
@@ -80,6 +83,10 @@ const ScheduleFormModal = ({ editSchedule, showModal, onClose, onSubmit }) => {
             onPressEnter={handleEditSubmit}
             needConfirm={false}
           />
+        </div>
+        <div className='d-flex flex-column gap-1'>
+          <Title level={5}>Execution Browser <Text type='danger'>*</Text></Title>
+          <Select options={executionBrowserOptions} value={selectedBrowser} onChange={setSelectedBrowser} />
         </div>
         {scheduleError && <Text type='danger'>{scheduleError}</Text>}
       </div>

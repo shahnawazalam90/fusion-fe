@@ -5,7 +5,7 @@ import {
   SET_POSTS,
   SET_EDIT_SCENARIO_INFO,
   SET_CURRENT_SCENARIO,
-  SET_CURRENT_SCENARIO_VALUE,
+  SET_CURRENT_SCENARIO_REQUEST_ID,
   SET_USER_SCENARIOS,
   SET_USER_REPORTS,
   SET_CURRENT_REPORT,
@@ -26,10 +26,10 @@ const rootReducer = (state = initialState, action) => {
       return { ...state, posts: action.payload };
     case SET_CURRENT_SCENARIO:
       return { ...state, currentScenario: action.payload };
-    case SET_CURRENT_SCENARIO_VALUE:
+    case SET_CURRENT_SCENARIO_REQUEST_ID:
       {
         if (!action.payload) return state;
-        const { parentIndex, childIndex, value } = action.payload;
+        const { parentIndex, childIndex, requestId } = action.payload;
 
         // Create a deep copy of currentScenario
         const currentScenario = { ...state.currentScenario };
@@ -39,7 +39,7 @@ const rootReducer = (state = initialState, action) => {
             ? {
               ...scenario,
               actions: scenario?.actions?.map((action, idx) =>
-                idx === childIndex ? { ...action, value } : action
+                idx === childIndex ? { ...action, requestId } : action
               ),
             }
             : scenario

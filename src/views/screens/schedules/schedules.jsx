@@ -47,8 +47,8 @@ const Schedules = () => {
       });
   };
 
-  const handleEditSubmit = (name, dateTime) => {
-    updateSchedule(editSchedule.id, name, new Date(dateTime).toUTCString())
+  const handleEditSubmit = (name, dateTime, browser) => {
+    updateSchedule(editSchedule.id, name, new Date(dateTime).toUTCString(), browser)
       .then(({ success }) => {
         if (success) {
           notify.success('Scenario update successfully!');

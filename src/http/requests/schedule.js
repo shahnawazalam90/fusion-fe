@@ -2,12 +2,13 @@ import { post, put, get, del } from 'src/http/utils';
 import store from 'src/store';
 import { setSchedules } from 'src/store/actions';
 
-export const scheduleScenario = async (scheduleName, scheduleTime, scenarios) => {
+export const scheduleScenario = async (scheduleName, scheduleTime, scenarios, browser) => {
   const url = '/api/v1/schedules';
   const payload = new URLSearchParams();
   payload.append('name', scheduleName);
   payload.append('scheduleTime', scheduleTime);
   payload.append('scenarios', JSON.stringify(scenarios));
+  payload.append('browser', browser);
 
   try {
     const response = await post(url, payload, {

@@ -21,9 +21,9 @@ const CreateScenario = () => {
 
   const [screensChecked, setScreensChecked] = useState([]);
   const [screenValues, setScreenValues] = useState({});
+  const [requestSelections, setRequestSelections] = useState({});
   const [editEnabled, setEditEnabled] = useState(false);
   const [scenarioName, setScenarioName] = useState('');
-  const [requestId, setRequestId] = useState(null);
   const [scenarioURL, setScenarioURL] = useState('');
 
   const filteredScreens = useMemo(() => {
@@ -50,15 +50,18 @@ const CreateScenario = () => {
 
   useEffect(() => {
     const screenValuesNew = {};
+    const requestSelectionsNew = {};
     filteredScreens.forEach(({ actions }, i) => {
       actions.forEach((action, j) => {
         if (['fill', 'selectOption'].includes(action.action)) {
           screenValuesNew[`${i},${j}`] = '';
+          requestSelectionsNew[`${i},${j}`] = null;
         }
       });
     });
 
     setScreenValues(screenValuesNew);
+    setRequestSelections(requestSelectionsNew);
   }, [filteredScreens]);
 
   const checkAllScreens = () => {
@@ -125,12 +128,21 @@ const CreateScenario = () => {
       return;
     }
 
+    const filteredScreensCopy = [...filteredScreens]
+
+    Object.keys(requestSelections).forEach((key) => {
+      const [screenIndex, actionIndex] = key.split(',').map(Number);
+      const requestId = requestSelections[key];
+      if (requestId) {
+        filteredScreensCopy[screenIndex].actions[actionIndex].requestId = requestId;
+      }
+    });
+
     postScenario(
       scenarioName,
       scenarioURL,
-      JSON.stringify(filteredScreens),
-      JSON.stringify(Object.keys(screenValues)?.map((key) => [key, screenValues[key]])),
-      requestId
+      JSON.stringify(filteredScreensCopy),
+      JSON.stringify(Object.keys(screenValues)?.map((key) => [key, screenValues[key]]))
     )
       .then((res) => {
         if (res.status === 'success') {
@@ -176,29 +188,14 @@ const CreateScenario = () => {
                   </label>
                 )}
                 {(editEnabled) && (
-                  <div className='d-flex gap-3 w-100'>
-                    <div className='d-flex flex-column gap-1 flex-grow-1'>
+                  <div className='d-flex w-100 align-items-center justify-content-between'>
+                    <div className='d-flex flex-column gap-1 w-33'>
                       <Title level={5}>Scenario Name <Text type='danger'>*</Text></Title>
                       <Input
                         name='Scenario Name'
                         placeholder='Enter Scenario Name'
                         onChange={e => setScenarioName(e.target.value)}
                         value={scenarioName}
-                      />
-                    </div>
-                    <div className='d-flex flex-column gap-1 w-33'>
-                      <Title level={5}>Request</Title>
-                      <Select
-                        name='Request'
-                        value={requestId || null}
-                        onChange={setRequestId}
-                        options={[
-                          { label: 'None', value: null },
-                          ...(requests ? requests.map((request) => ({
-                            label: request.name,
-                            value: request.id,
-                          })) : []),
-                        ]}
                       />
                     </div>
                     <div className='d-flex flex-column gap-1'>
@@ -257,26 +254,46 @@ const CreateScenario = () => {
                         columns={[
                           {
                             title: 'Field Name',
-                            className: 'w-50',
+                            className: 'w-33',
                             dataIndex: 'actionName',
                             key: 'actionName',
                             render: (text) => <Text>{text}</Text>,
                           },
                           {
                             title: 'Value',
-                            className: 'w-50',
+                            className: 'w-33',
                             dataIndex: 'value',
                             key: 'value',
                             render: (text, record) => (
                               <Input
                                 className='w-100'
                                 value={text}
-                                disabled={!record.editEnabled}
+                                disabled={!editEnabled}
                                 onChange={(e) => {
                                   const newScreenValues = { ...screenValues };
                                   newScreenValues[`${record.screenIndex},${record.actionIndex}`] = e.target.value;
                                   setScreenValues(newScreenValues);
                                 }}
+                              />
+                            ),
+                          },
+                          {
+                            title: 'Request',
+                            className: 'w-33',
+                            render: (_, record) => (
+                              <Select
+                                name='Request'
+                                className='w-100'
+                                disabled={!editEnabled}
+                                value={requestSelections[`${record.screenIndex},${record.actionIndex}`] || null}
+                                onChange={val => setRequestSelections({ ...requestSelections, [`${record.screenIndex},${record.actionIndex}`]: val })}
+                                options={[
+                                  { label: 'None', value: null },
+                                  ...(requests ? requests.map((request) => ({
+                                    label: request.name,
+                                    value: request.id,
+                                  })) : []),
+                                ]}
                               />
                             ),
                           },
@@ -289,7 +306,6 @@ const CreateScenario = () => {
                               key: `${screen.screenName}-${j}`,
                               actionName: toTitleCase(options?.name || selector),
                               value: screenValues[`${i},${j}`] || '',
-                              editEnabled,
                               screenIndex: i,
                               actionIndex: j,
                             });

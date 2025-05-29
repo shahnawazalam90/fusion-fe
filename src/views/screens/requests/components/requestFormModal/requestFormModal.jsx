@@ -23,6 +23,7 @@ const RequestFormModal = ({ modalState, requestInfo, onClose, onSubmit }) => {
         type: requestInfo.type || requestModalInitialValues.type,
         pollingInterval: Number(JSON.parse(requestInfo.pollingOptions)?.pollingInterval || requestModalInitialValues.pollingInterval),
         pollingTimeout: Number(JSON.parse(requestInfo.pollingOptions)?.pollingTimeout || requestModalInitialValues.pollingTimeout),
+        expectedStatus: Number(requestInfo.expectedStatus || 200) || requestModalInitialValues.expectedStatus,
         expectedResponse: JSON.parse(requestInfo.expectedResponse) || requestModalInitialValues.expectedResponse,
         payload: JSON.parse(requestInfo.payload) || requestModalInitialValues.payload,
         error: '',
@@ -45,6 +46,11 @@ const RequestFormModal = ({ modalState, requestInfo, onClose, onSubmit }) => {
 
     if (request.type === 'polling' && (request.pollingInterval <= 0 || request.pollingTimeout <= 0)) {
       setRequest({ error: 'Polling interval and timeout must be greater than 0.' });
+      return;
+    }
+
+    if (!request.expectedStatus || request.expectedStatus < 100 || request.expectedStatus > 599) {
+      setRequest({ error: 'Enter a valid expected status code (100-599).' });
       return;
     }
 
@@ -106,7 +112,21 @@ const RequestFormModal = ({ modalState, requestInfo, onClose, onSubmit }) => {
           />
         </div>
         <div className='d-flex gap-2'>
-          <div className='d-flex flex-column gap-1 w-33'>
+          <div className='d-flex flex-column gap-1 w-25'>
+            <Title level={5}>Expected Status <Text type='danger'>*</Text></Title>
+            <InputNumber
+              className='w-100'
+              name='Expected Status'
+              placeholder='Expected Status'
+              type='number'
+              min={100}
+              max={599}
+              value={request.expectedStatus}
+              onChange={val => setRequest({ expectedStatus: val, error: '' })}
+              readOnly={modalState === requestModalMode.view}
+            />
+          </div>
+          <div className='d-flex flex-column gap-1 w-25'>
             <Title level={5}>Type <Text type='danger'>*</Text></Title>
             <Select
               name='Type'
@@ -118,7 +138,7 @@ const RequestFormModal = ({ modalState, requestInfo, onClose, onSubmit }) => {
           </div>
           {request.type === 'polling' && (
             <>
-              <div className='d-flex flex-column gap-1 w-33'>
+              <div className='d-flex flex-column gap-1 w-25'>
                 <Title level={5}>Polling Interval (mins)</Title>
                 <InputNumber
                   className='w-100'
@@ -131,7 +151,7 @@ const RequestFormModal = ({ modalState, requestInfo, onClose, onSubmit }) => {
                   readOnly={modalState === requestModalMode.view}
                 />
               </div>
-              <div className='d-flex flex-column gap-1 w-33'>
+              <div className='d-flex flex-column gap-1 w-25'>
                 <Title level={5}>Polling Timeout (mins)</Title>
                 <InputNumber
                   className='w-100'

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { useSelector } from 'react-redux';
 
 import { getScenarioById, updateScenario, listRequests } from "src/http";
+import { setCurrentScenarioRequestId } from 'src/store/actions';
 import { toTitleCase, writeArrayToExcel, readExcelToArray, scenarioScreensToRefArray, checkExcelValidity } from "src/utils";
 import { notify } from 'src/notify';
 
@@ -143,7 +144,7 @@ const EditScenario = () => {
             <div className='d-flex flex-column gap-3'>
               <div className="d-flex flex-column gap-1">
                 <div className='d-flex gap-3 w-100'>
-                  <div className='d-flex flex-column gap-1 flex-grow-1'>
+                  <div className='d-flex flex-column gap-1 w-33'>
                     <Title level={5}>Scenario Name <Text type='danger'>*</Text></Title>
                     <Input
                       name='Scenario Name'
@@ -152,19 +153,13 @@ const EditScenario = () => {
                       value={scenarioName}
                     />
                   </div>
-                  <div className='d-flex flex-column gap-1 w-33'>
-                    <Title level={5}>Request</Title>
-                    <Select
-                      name='Request'
-                      value={requestId || null}
-                      onChange={setRequestId}
-                      options={[
-                        { label: 'None', value: null },
-                        ...(requests ? requests.map((request) => ({
-                          label: request.name,
-                          value: request.id,
-                        })) : []),
-                      ]}
+                  <div className='d-flex flex-column gap-1 flex-grow-1'>
+                    <Title level={5}>Scenario URL <Text type='danger'>*</Text></Title>
+                    <Input
+                      name='Scenario URL'
+                      placeholder='Enter Scenario URL'
+                      onChange={e => setScenarioURL(e.target.value)}
+                      value={scenarioURL}
                     />
                   </div>
                   <div className='d-flex flex-column gap-1'>
@@ -192,15 +187,6 @@ const EditScenario = () => {
                       />
                     </div>
                   </div>
-                </div>
-                <div className='d-flex flex-column gap-1 flex-grow-1'>
-                  <Title level={5}>Scenario URL <Text type='danger'>*</Text></Title>
-                  <Input
-                    name='Scenario URL'
-                    placeholder='Enter Scenario URL'
-                    onChange={e => setScenarioURL(e.target.value)}
-                    value={scenarioURL}
-                  />
                 </div>
               </div>
 
@@ -244,6 +230,25 @@ const EditScenario = () => {
                                   newScreenValues[`${record.screenIndex},${record.actionIndex}`] = e.target.value;
                                   setScreenValues(newScreenValues);
                                 }}
+                              />
+                            ),
+                          },
+                          {
+                            title: 'Request',
+                            className: 'w-33',
+                            render: (_, record) => (
+                              <Select
+                                name='Request'
+                                className='w-100'
+                                value={record.requestId || null}
+                                onChange={val => setCurrentScenarioRequestId(record.screenIndex, record.actionIndex, val)}
+                                options={[
+                                  { label: 'None', value: null },
+                                  ...(requests ? requests.map((request) => ({
+                                    label: request.name,
+                                    value: request.id,
+                                  })) : []),
+                                ]}
                               />
                             ),
                           },

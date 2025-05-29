@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Divider, Typography } from 'antd';
+import { Button, Divider, Popconfirm, Select, Typography } from 'antd';
 import { ClearOutlined, ClockCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
@@ -11,6 +11,7 @@ import {
   executeScenario,
   scheduleScenario,
 } from 'src/http';
+import { executionBrowserOptions } from 'src/utils';
 import { notify } from 'src/notify';
 import store from 'src/store';
 import { setCurrentScenario, setEditScenarioInfo } from 'src/store/actions';
@@ -32,6 +33,7 @@ const Dashboard = () => {
   const [selectedScenarios, setSelectedScenarios] = useState({});
   const [scenariosValues, setScenariosValues] = useState({});
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedBrowser, setSelectedBrowser] = useState(executionBrowserOptions[0].value);
 
   useEffect(() => {
     getUserScenarios();
@@ -94,7 +96,7 @@ const Dashboard = () => {
   };
 
   const handleScenarioExecute = () => {
-    executeScenario(mapSelectedScenarioValues())
+    executeScenario(mapSelectedScenarioValues(), selectedBrowser)
       .then(({ status, data }) => {
         if (status === 'success') {
           setSelectedScenarios({});
@@ -109,11 +111,12 @@ const Dashboard = () => {
       });
   };
 
-  const handleScheduleScenario = (name, dateTime) => {
+  const handleScheduleScenario = (name, dateTime, browser) => {
     scheduleScenario(
       name,
       new Date(dateTime).toUTCString(),
-      mapSelectedScenarioValues()
+      mapSelectedScenarioValues(),
+      browser
     )
       .then(({ success }) => {
         if (success) {
@@ -187,13 +190,20 @@ const Dashboard = () => {
               </Button>
               <Divider type='vertical' className='py-2' />
               <div className='d-flex gap-1'>
-                <Button
-                  type='primary'
-                  onClick={handleScenarioExecute}
-                  disabled={disableScenarioActions}
+                <Popconfirm
+                  title="Select Execution Browser"
+                  description={<Select className='w-100 my-2' options={executionBrowserOptions} value={selectedBrowser} onChange={setSelectedBrowser} />}
+                  onConfirm={handleScenarioExecute}
+                  okText="Submit"
+                  cancelText="Cancel"
                 >
-                  Execute
-                </Button>
+                  <Button
+                    type='primary'
+                    disabled={disableScenarioActions}
+                  >
+                    Execute
+                  </Button>
+                </Popconfirm>
                 <Button
                   type='primary'
                   icon={<ClockCircleOutlined />}
@@ -211,7 +221,7 @@ const Dashboard = () => {
           onSubmit={handleScheduleScenario}
         />
       </>
-    </DefaultLayout>
+    </DefaultLayout >
   );
 };
 

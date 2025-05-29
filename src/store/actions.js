@@ -5,7 +5,7 @@ import {
   SET_POSTS,
   SET_EDIT_SCENARIO_INFO,
   SET_CURRENT_SCENARIO,
-  SET_CURRENT_SCENARIO_VALUE,
+  SET_CURRENT_SCENARIO_REQUEST_ID,
   SET_USER_SCENARIOS,
   SET_USER_REPORTS,
   SET_CURRENT_REPORT,
@@ -37,9 +37,9 @@ export const setCurrentScenario = (scenario) => ({
   payload: scenario,
 });
 
-export const setCurrentScenarioValue = (parentIndex, childIndex, value) => ({
-  type: SET_CURRENT_SCENARIO_VALUE,
-  payload: { parentIndex, childIndex, value },
+export const setCurrentScenarioRequestId = (parentIndex, childIndex, requestId) => ({
+  type: SET_CURRENT_SCENARIO_REQUEST_ID,
+  payload: { parentIndex, childIndex, requestId },
 });
 
 export const setEditScenarioInfo = ({id, name}) => ({

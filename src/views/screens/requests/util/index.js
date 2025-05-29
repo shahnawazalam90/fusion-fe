@@ -34,6 +34,7 @@ export const requestModalInitialValues = {
   type: requestTypeOptions[0].value,
   pollingInterval: 0,
   pollingTimeout: 0,
+  expectedStatus: 200,
   expectedResponse: '',
   payload: '',
   error: '',

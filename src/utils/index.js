@@ -16,3 +16,10 @@ export function downloadJSON(content, filename, indentSpaces) {
   URL.revokeObjectURL(link.href);
   return;
 }
+
+export const executionBrowserOptions = [
+  { label: 'Chrome', value: 'chrome' },
+  { label: 'Firefox', value: 'firefox' },
+  { label: 'Edge', value: 'edge' },
+  { label: 'Safari', value: 'safari' },
+];
