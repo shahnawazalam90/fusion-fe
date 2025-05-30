@@ -91,7 +91,7 @@ const Report = () => {
                   dataIndex: 'action',
                   key: 'action',
                   render: (text, record) => (
-                    ['completed', 'failed'].includes(record.status) && (
+                    (['completed', 'failed'].includes(record.status) && record.filePath) && (
                       <Button icon={<EyeOutlined />} onClick={() => setSelectedReport(record)}>
                         View Report
                       </Button>
