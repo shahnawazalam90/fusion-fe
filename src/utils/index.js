@@ -18,8 +18,8 @@ export function downloadJSON(content, filename, indentSpaces) {
 }
 
 export const executionBrowserOptions = [
-  { label: 'Chrome', value: 'chrome' },
+  { label: 'Chrome', value: 'chromium' },
   { label: 'Firefox', value: 'firefox' },
   { label: 'Edge', value: 'edge' },
-  { label: 'Safari', value: 'safari' },
+  { label: 'Safari', value: 'webkit' },
 ];
