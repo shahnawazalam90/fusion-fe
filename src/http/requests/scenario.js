@@ -89,13 +89,14 @@ export const postScenario = async (name, screenUrl, jsonMetaData, dataManual) =>
   }
 };
 
-export const updateScenario = async (scenarioId, name, screenUrl, dataManual) => {
+export const updateScenario = async (scenarioId, name, screenUrl, dataManual, screens) => {
   const url = '/api/v1/scenarios/update';
   const payload = new URLSearchParams();
   payload.append('id', scenarioId);
   payload.append('name', name);
   payload.append('url', screenUrl);
   payload.append('dataManual', dataManual);
+  payload.append('jsonMetaData', JSON.stringify(screens));
 
   try {
     const response = await put(url, payload, {

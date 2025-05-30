@@ -61,7 +61,8 @@ export const updateRequest = async (id, request) => {
   payload.append('method', request.method);
   payload.append('url', request.url);
   payload.append('headers', JSON.stringify(request.headers));
-  payload.append('expectedResponse', JSON.stringify(request.expectedResponse));
+  payload.append('expectedResponse', JSON.stringify(request.expectedResponse));  
+  payload.append('expectedStatus', request.expectedStatus);  
   payload.append('payload', JSON.stringify(request.payload));
   payload.append('type', request.type);
   payload.append(

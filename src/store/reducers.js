@@ -29,21 +29,22 @@ const rootReducer = (state = initialState, action) => {
     case SET_CURRENT_SCENARIO_REQUEST_ID:
       {
         if (!action.payload) return state;
-        const { parentIndex, childIndex, requestId } = action.payload;
+        const { screenIndex, requestId } = action.payload;
 
         // Create a deep copy of currentScenario
         const currentScenario = { ...state.currentScenario };
 
-        currentScenario.screens = currentScenario?.screens?.map((scenario, index) =>
-          index === parentIndex
-            ? {
-              ...scenario,
-              actions: scenario?.actions?.map((action, idx) =>
-                idx === childIndex ? { ...action, requestId } : action
-              ),
-            }
-            : scenario
-        );
+        currentScenario.screens = Array.isArray(currentScenario.screens) ? [...currentScenario.screens] : [];
+        if (currentScenario.screens[screenIndex]) {
+          // Ensure the screen exists before modifying it
+          currentScenario.screens[screenIndex] = {
+            ...currentScenario.screens[screenIndex],
+            requestId: requestId || null // Set to null if requestId is falsy
+          };
+        } else {
+          // If the screen does not exist, initialize it
+          currentScenario.screens[screenIndex] = { requestId: requestId || null };
+        }
 
         return { ...state, currentScenario };
       }

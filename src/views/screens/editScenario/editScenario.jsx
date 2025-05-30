@@ -24,13 +24,11 @@ const EditScenario = () => {
 
   const [screenValues, setScreenValues] = useState({});
   const [scenarioName, setScenarioName] = useState('');
-  const [requestId, setRequestId] = useState(null);
   const [scenarioURL, setScenarioURL] = useState('');
 
   useEffect(() => {
     getScenarioById(editScenarioInfo?.id).then((scenario) => {
       setScenarioName(editScenarioInfo.name || '');
-      setRequestId(scenario.requestId || null);
       setScenarioURL(scenario.url || '');
       setScreenValues(Object.fromEntries(scenario.dataManual));
     });
@@ -107,7 +105,7 @@ const EditScenario = () => {
       scenarioName,
       scenarioURL,
       JSON.stringify(Object.keys(screenValues)?.map((key) => [key, screenValues[key]])),
-      requestId
+      currentScenario.screens,
     ).then((res) => {
       if (res.status === 'success') {
         notify.success('Scenario updated successfully!');
@@ -212,14 +210,14 @@ const EditScenario = () => {
                         columns={[
                           {
                             title: 'Field Name',
-                            className: 'w-33',
+                            className: 'w-50',
                             dataIndex: 'actionName',
                             key: 'actionName',
                             render: (text) => <Text>{text}</Text>,
                           },
                           {
                             title: 'Value',
-                            className: 'w-33',
+                            className: 'w-50',
                             dataIndex: 'value',
                             key: 'value',
                             render: (text, record) => (
@@ -234,28 +232,9 @@ const EditScenario = () => {
                               />
                             ),
                           },
-                          {
-                            title: 'Request',
-                            className: 'w-33',
-                            render: (_, record) => (
-                              <Select
-                                name='Request'
-                                className='w-100'
-                                value={record.requestId}
-                                onChange={val => store.dispatch(setCurrentScenarioRequestId(record.screenIndex, record.actionIndex, val))}
-                                options={[
-                                  { label: 'None', value: null },
-                                  ...(requests ? requests.map((request) => ({
-                                    label: request.name,
-                                    value: request.id,
-                                  })) : []),
-                                ]}
-                              />
-                            ),
-                          },
                         ]}
                         dataSource={
-                          screen?.actions?.map(({ action, options, selector, requestId }, j) => {
+                          screen?.actions?.map(({ action, options, selector }, j) => {
                             if (!['fill', 'selectOption'].includes(action)) return null;
 
                             return ({
@@ -264,10 +243,27 @@ const EditScenario = () => {
                               value: screenValues[`${i},${j}`] || '',
                               screenIndex: i,
                               actionIndex: j,
-                              requestId: requestId || null,
                             });
                           })?.filter(Boolean) // Filter out null values
                         }
+                        footer={() => (
+                          <div className='d-flex align-items-center gap-2 justify-content-center'>
+                            <Text>Select Request for this screen</Text>
+                            <Select
+                              name='Request'
+                              className='w-25'
+                              value={screen.requestId}
+                              onChange={val => store.dispatch(setCurrentScenarioRequestId(i, val))}
+                              options={[
+                                { label: 'None', value: null },
+                                ...(requests ? requests.map((request) => ({
+                                  label: request.name,
+                                  value: request.id,
+                                })) : []),
+                              ]}
+                            />
+                          </div>
+                        )}
                       />
                     ),
                   }))

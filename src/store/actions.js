@@ -37,9 +37,9 @@ export const setCurrentScenario = (scenario) => ({
   payload: scenario,
 });
 
-export const setCurrentScenarioRequestId = (parentIndex, childIndex, requestId) => ({
+export const setCurrentScenarioRequestId = (screenIndex, requestId) => ({
   type: SET_CURRENT_SCENARIO_REQUEST_ID,
-  payload: { parentIndex, childIndex, requestId },
+  payload: { screenIndex, requestId },
 });
 
 export const setEditScenarioInfo = ({id, name}) => ({
