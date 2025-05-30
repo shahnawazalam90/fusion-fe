@@ -11,7 +11,7 @@ export function downloadJSON(content, filename, indentSpaces) {
   const blob = new Blob([formattedContent], { type: 'application/json' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.download = filename;
+  link.download = `${filename}.json`;
   link.click();
   URL.revokeObjectURL(link.href);
   return;

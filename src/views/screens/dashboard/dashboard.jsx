@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Divider, Popconfirm, Select, Typography } from 'antd';
-import { ClearOutlined, ClockCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import { ClearOutlined, ClockCircleOutlined, DownloadOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 
@@ -10,8 +10,9 @@ import {
   updateScenarioExcelData,
   executeScenario,
   scheduleScenario,
+  getScenarioJSON,
 } from 'src/http';
-import { executionBrowserOptions } from 'src/utils';
+import { downloadJSON, executionBrowserOptions } from 'src/utils';
 import { notify } from 'src/notify';
 import store from 'src/store';
 import { setCurrentScenario, setEditScenarioInfo } from 'src/store/actions';
@@ -93,6 +94,21 @@ const Dashboard = () => {
   const mapSelectedScenarioValues = () => {
     return Object.keys(selectedScenarios)
       ?.map((scenarioId) => ({ scenarioId, valuesType: scenariosValues[scenarioId] }));
+  };
+
+  const handleDownloadExecutionData = () => {
+    const scenarios = mapSelectedScenarioValues();
+    getScenarioJSON(scenarios)
+      .then(({ status, data }) => {
+        if (status === 'success') {
+          downloadJSON(data, 'execution_data.json', 4);
+        } else {
+          notify.error('Failed to download execution data. Please try again.');
+        }
+      })
+      .catch(() => {
+        notify.error('Something went wrong while trying to download the execution data.');
+      });
   };
 
   const handleScenarioExecute = () => {
@@ -187,6 +203,13 @@ const Dashboard = () => {
                 danger
               >
                 Clear Selection
+              </Button>
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={handleDownloadExecutionData}
+                disabled={disableScenarioActions}
+              >
+                Downlaod Execution Data
               </Button>
               <Divider type='vertical' className='py-2' />
               <div className='d-flex gap-1'>
