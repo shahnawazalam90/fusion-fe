@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { useSelector } from 'react-redux';
 
 import { getScenarioById, updateScenario, listRequests } from "src/http";
+import store from 'src/store';
 import { setCurrentScenarioRequestId } from 'src/store/actions';
 import { toTitleCase, writeArrayToExcel, readExcelToArray, scenarioScreensToRefArray, checkExcelValidity } from "src/utils";
 import { notify } from 'src/notify';
@@ -211,14 +212,14 @@ const EditScenario = () => {
                         columns={[
                           {
                             title: 'Field Name',
-                            className: 'w-50',
+                            className: 'w-33',
                             dataIndex: 'actionName',
                             key: 'actionName',
                             render: (text) => <Text>{text}</Text>,
                           },
                           {
                             title: 'Value',
-                            className: 'w-50',
+                            className: 'w-33',
                             dataIndex: 'value',
                             key: 'value',
                             render: (text, record) => (
@@ -240,8 +241,8 @@ const EditScenario = () => {
                               <Select
                                 name='Request'
                                 className='w-100'
-                                value={record.requestId || null}
-                                onChange={val => setCurrentScenarioRequestId(record.screenIndex, record.actionIndex, val)}
+                                value={record.requestId}
+                                onChange={val => store.dispatch(setCurrentScenarioRequestId(record.screenIndex, record.actionIndex, val))}
                                 options={[
                                   { label: 'None', value: null },
                                   ...(requests ? requests.map((request) => ({
@@ -254,7 +255,7 @@ const EditScenario = () => {
                           },
                         ]}
                         dataSource={
-                          screen?.actions?.map(({ action, options, selector }, j) => {
+                          screen?.actions?.map(({ action, options, selector, requestId }, j) => {
                             if (!['fill', 'selectOption'].includes(action)) return null;
 
                             return ({
@@ -263,6 +264,7 @@ const EditScenario = () => {
                               value: screenValues[`${i},${j}`] || '',
                               screenIndex: i,
                               actionIndex: j,
+                              requestId: requestId || null,
                             });
                           })?.filter(Boolean) // Filter out null values
                         }

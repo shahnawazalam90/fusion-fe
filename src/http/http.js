@@ -37,7 +37,7 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error?.response?.data?.message === 'Token expired') {
+    if (error?.response?.data?.message === 'Token expired' || error?.response?.data?.message === 'User not found') {
         debounceTokenExpiredNotification();
     }
     return Promise.reject(error);
