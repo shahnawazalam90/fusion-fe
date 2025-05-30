@@ -94,7 +94,7 @@ export const updateScenario = async (scenarioId, name, screenUrl, dataManual) =>
   const payload = new URLSearchParams();
   payload.append('id', scenarioId);
   payload.append('name', name);
-  payload.append('screenUrl', screenUrl);
+  payload.append('url', screenUrl);
   payload.append('dataManual', dataManual);
 
   try {
