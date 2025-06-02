@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button, Checkbox, Collapse, Empty, Input, Select, Table, Typography } from 'antd';
 import { ArrowLeftOutlined, CloseOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router";
@@ -34,6 +34,10 @@ const EditScenario = () => {
     });
     listRequests();
   }, [editScenarioInfo]);
+
+  const requestsIdMap = useMemo(() => ({
+    ...(Object.fromEntries(requests?.map((request) => [request.id, true])) || {}),
+  }), [requests]);
 
   const handleExcelDownload = () => {
     let scenarioRefArray = scenarioScreensToRefArray(currentScenario.screens);
@@ -118,6 +122,8 @@ const EditScenario = () => {
       notify.error('Failed to update scenario. Please try again.');
     });
   };
+
+
 
   return (
     <DefaultLayout>
@@ -249,10 +255,13 @@ const EditScenario = () => {
                         footer={() => (
                           <div className='d-flex align-items-center gap-2 justify-content-center'>
                             <Text>Select Request for this screen</Text>
+                            {console.log('screen.requestId', screen.requestId)}
+                            {console.log('requests', requests)}
                             <Select
                               name='Request'
                               className='w-25'
-                              value={screen.requestId}
+                              defaultActiveFirstOption={true}
+                              value={requestsIdMap(screen.requestId)? screen.requestId : null}
                               onChange={val => store.dispatch(setCurrentScenarioRequestId(i, val))}
                               options={[
                                 { label: 'None', value: null },
