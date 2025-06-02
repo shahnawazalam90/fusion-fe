@@ -97,7 +97,7 @@ const Schedules = () => {
                   dataIndex: 'status',
                   key: 'status',
                   className: 'text-nowrap',
-                  render: (text, record) => record.isActive ? 'Pending' : 'Complete',
+                  render: (text, record) => record.isActive ? 'Pending' : 'Executed',
                 },
                 {
                   title: 'Scheduled Time',
